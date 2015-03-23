@@ -97,14 +97,25 @@ var map2D = (function () {
                 alert("Save edit before viewing the cross section");
                 return;
             }
-            if (linelength == 0) {
+            if (linelength === 0) {
                 alert("Draw a cross-section first");
                 return;
             } else if (linelength >= 1400) {
                 alert("cross section too long");
                 return;
             }
-            window.open("../3D/index.html?x1=" + toLon(y1) + "&y1=" + toLat(x1) + "&x2=" + toLon(y2) + "&y2=" + toLat(x2) + "&x3=" + toLon(y3) + "&y3=" + toLat(x3) + "&x4=" + toLon(y4) + "&y4=" + toLat(x4) + "&mag=" + map.parameters.mag + "&startdate=" + map.parameters.startdate + "&enddate=" + map.parameters.enddate);
+            this.render3DFrame("../3D/index.html?x1=" + toLon(y1) + "&y1=" + toLat(x1) + "&x2=" + toLon(y2) + "&y2=" + toLat(x2) + "&x3=" + toLon(y3) + "&y3=" + toLat(x3) + "&x4=" + toLon(y4) + "&y4=" + toLat(x4) + "&mag=" + map.parameters.mag + "&startdate=" + map.parameters.startdate + "&enddate=" + map.parameters.enddate);
+        },
+
+        render3DFrame: function(url) {
+            var frame = document.createElement("div");
+            frame.className = 'crosssection-popup';
+            frame.innerHTML = "<div class='close-button'><span class='ui-btn-icon-notext ui-icon-delete'></span></div><div class='iframe-wrapper'><iframe class='crosssection-iframe' src='" + url + "'></iframe></div>";
+            document.body.appendChild(frame);
+
+            $('.close-button').click(function() {
+                document.body.removeChild(frame);
+            });
         },
 
         // Start a new cross section drawing

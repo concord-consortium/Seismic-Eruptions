@@ -34,3 +34,8 @@
   width: 100%;
   height: 100%;
 }
+
+.leaflet-popup-pane .leaflet-popup-content {
+  color: black;
+  text-shadow: 0 1px 0 #f3f3f3;
+}

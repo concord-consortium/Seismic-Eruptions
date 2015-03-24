@@ -285,7 +285,7 @@ var map2D = (function () {
 
         map.parameters.defaultInit();
 
-        map.layers.baseLayer1.addTo(map.leafletMap);
+        map.layers.baseLayer2.addTo(map.leafletMap);
 
         map.leafletMap.fitBounds([
             [50, 40],

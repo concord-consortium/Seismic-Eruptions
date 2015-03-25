@@ -154,6 +154,7 @@ var map2D = (function () {
 
     //	colour gradient generator
     var rainbow = new Rainbow();
+    rainbow.setNumberRange(0, 700);
 
     var controller = {
 
@@ -201,7 +202,7 @@ var map2D = (function () {
             };
 
             // var geojsonURL = '//static.local/seismic/tiles/{z}/{x}/{y}.json';
-            geojsonURL = function(tilePoint) {
+            var geojsonURL = function(tilePoint) {
                 var tileSize = this.options.tileSize,
                     nwPoint = tilePoint.multiplyBy(tileSize),
                     sePoint = nwPoint.add(new L.Point(tileSize, tileSize)),
@@ -229,12 +230,13 @@ var map2D = (function () {
                     },
                     style: style,
                     onEachFeature: function (feature, layer) {
+                        var depth = getDepth(feature);
                         layer.setStyle({
                             radius: feature.properties.mag,
-                            fillColor: "#" + rainbow.colourAt(feature.properties.mag)
+                            fillColor: "#" + rainbow.colourAt(depth)
                         });
                         if (feature.properties) {
-                            layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + timeConverter(feature.properties.time) + "</br>Depth : " + getDepth(feature) + " km");
+                            layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + timeConverter(feature.properties.time) + "</br>Depth : " + depth + " km");
                         }
                         if (!(layer instanceof L.Point)) {
                             layer.on('mouseover', function () {

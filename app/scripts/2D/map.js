@@ -3,7 +3,7 @@ var map2D = (function () {
     //The map object with all the variables of current map being shown
     var map = {
 
-        leafletMap: L.map('map'),
+        leafletMap: L.map('map', {worldCopyJump: true}),
 
         crossSection: {},
 
@@ -14,13 +14,13 @@ var map2D = (function () {
 
             defaultInit: function () {
                 var d = new Date();
-                if (this.mag == undefined) {
+                if (this.mag === undefined) {
                     this.mag = 5;
                 }
-                if (this.startdate == undefined) {
+                if (this.startdate === undefined) {
                     this.startdate = "2009/1/1";
                 }
-                if (this.enddate == undefined) {
+                if (this.enddate === undefined) {
                     this.enddate = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate();
                 }
             }
@@ -42,12 +42,12 @@ var map2D = (function () {
         drawnItems: new L.FeatureGroup(), //features drawn on the map (constitute the cross-section)
 
         earthquakes: {
-            circles: new Array(), // Array of earthquake markers
-            time: new Array(), // time of occurrence of corresponding earthquakes
-            depth: new Array() // Array of depths of corresponding earthquakes
+            circles: [], // Array of earthquake markers
+            time: [], // time of occurrence of corresponding earthquakes
+            depth: [] // Array of depths of corresponding earthquakes
         },
 
-        array: new Array(),
+        array: [],
         magarray: {},
 
         editing: false, //state of the map
@@ -172,69 +172,89 @@ var map2D = (function () {
         snd: new Audio("tap.wav"), // buffers automatically when created
 
         initController: function () {
+            loadCountFile();
 
-            this.script.src = 'http://comcat.cr.usgs.gov/fdsnws/event/1/query?starttime=' + map.parameters.startdate + '%0000:00:00&minmagnitude=' + map.parameters.mag + '&format=geojson&callback=eqfeed_callback&endtime=' + map.parameters.enddate + '%0000:00:00&orderby=time-asc';
-            document.getElementsByTagName('body')[0].appendChild(this.script);
-            window.eqfeed_callback = function (results) {
+            var style = {
+                "clickable": true,
+                "color": "#000",
+                "fillColor": "#00D",
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.3
+            };
+            var hoverStyle = {
+                "fillOpacity": 1.0
+            };
+            var unhoverStyle = {
+                "fillOpacity": 0.3
+            };
 
-                map.values.size = results.features.length;
+            var getDepth = function(feature) {
+                try {
+                    return feature.geometry.geometries[0].coordinates[2];
+                } catch(e) {}
+                try {
+                    return feature.geometry.coordinates[2];
+                } catch(e) {}
+                console.log('Failed to find depth!', feature);
+                return '???';
+            };
 
-                for (var i = 0; i < map.values.size; i++) {
-                    map.earthquakes.circles[i] = L.geoJson(results.features[i], {
-                        pointToLayer: function (feature, latlng) {
-                            return L.circleMarker(latlng, {
-                                radius: results.features[i].properties.mag,
-                                fillColor: "#" + rainbow.colourAt(results.features[i].properties.mag),
-                                color: "#000",
-                                weight: 1,
-                                opacity: 1,
-                                fillOpacity: 1
+            // var geojsonURL = '//static.local/seismic/tiles/{z}/{x}/{y}.json';
+            geojsonURL = function(tilePoint) {
+                var tileSize = this.options.tileSize,
+                    nwPoint = tilePoint.multiplyBy(tileSize),
+                    sePoint = nwPoint.add(new L.Point(tileSize, tileSize)),
+                    nw = this._map.unproject(nwPoint),
+                    se = this._map.unproject(sePoint),
+                    zoom = this._getZoomForUrl(),
+                    num_tiles = Math.pow(2, zoom),
+                    current_mag = 7 - (zoom <= 3 ? 0 : ((zoom-3)/2));
+
+                var url = 'http://comcat.cr.usgs.gov/fdsnws/event/1/query?starttime=1900/1/1%0000:00:00&endtime=2015/3/25%0000:00:00&eventtype=earthquake&orderby=time-asc&format=geojson' +
+                         '&minmagnitude=' + current_mag +
+                         '&minlatitude=' + se.lat +
+                         '&maxlatitude=' + nw.lat +
+                         '&minlongitude=' + nw.lng +
+                         '&maxlongitude=' + se.lng +
+                         '&callback=' + tilePoint.requestId;
+                return url;
+            };
+            var geojsonTileLayer = new L.TileLayer.GeoJSONP(geojsonURL, {
+                    clipTiles: false,
+                    wrapPoints: true
+                }, {
+                    pointToLayer: function (feature, latlng) {
+                        return L.circleMarker(latlng, style);
+                    },
+                    style: style,
+                    onEachFeature: function (feature, layer) {
+                        layer.setStyle({
+                            radius: feature.properties.mag,
+                            fillColor: "#" + rainbow.colourAt(feature.properties.mag)
+                        });
+                        if (feature.properties) {
+                            layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + timeConverter(feature.properties.time) + "</br>Depth : " + getDepth(feature) + " km");
+                        }
+                        if (!(layer instanceof L.Point)) {
+                            layer.on('mouseover', function () {
+                                layer.setStyle(hoverStyle);
+                            });
+                            layer.on('mouseout', function () {
+                                layer.setStyle(unhoverStyle);
                             });
                         }
-                    }).bindPopup("Place: <b>" + results.features[i].properties.place + "</b></br>Magnitude : <b>" + results.features[i].properties.mag + "</b></br>Time : " + timeConverter(results.features[i].properties.time) + "</br>Depth : " + results.features[i].geometry.coordinates[2] + " km");
-
-                    map.earthquakes.time[i] = results.features[i].properties.time
-                    map.earthquakes.depth[i] = results.features[i].geometry.coordinates[2];
-                    if (map.earthquakes.depth[i] > map.values.maxdepth) map.values.maxdepth = map.earthquakes.depth[i];
-                    if (map.earthquakes.depth[i] < map.values.mindepth) map.values.mindepth = map.earthquakes.depth[i];
-
-                    // add events to timeline
-                    if (i > 0) {
-                        controller.timeLine.append(TweenLite.delayedCall(20 * ((results.features[i].properties.time - results.features[i - 1].properties.time) / 1000000000), map.mapAdder, [i.toString()]));
-                    } else {
-                        controller.timeLine.append(TweenLite.delayedCall(0, map.mapAdder, [i.toString()]));
                     }
                 }
-
-                rainbow.setNumberRange(map.values.mindepth, map.values.maxdepth);
-                map.values.timediff = results.features[map.values.size - 1].properties.time - results.features[0].properties.time;
-                map.parameters.starttime = results.features[0].properties.time;
-
-                $("#slider").slider({
-                    value: 0,
-                    range: "min",
-                    min: 0,
-                    max: map.values.timediff,
-                    slide: function (event, ui) {
-                        $("#date").html(timeConverter(map.parameters.starttime));
-                        controller.timeLine.pause();
-                        controller.timeLine.progress(ui.value / (map.values.timediff));
-                    }
-                })
-
-                $("#info").html("</br></br>total earthquakes : " + map.values.size + "</br>minimum depth : " + map.values.mindepth + " km</br>maximum depth : " + map.values.maxdepth + " km</br></br></br><div class='ui-body ui-body-a'><p><a href='http://github.com/gizmoabhinav/Seismic-Eruptions'>Link to the project</a></p></div>");
-                $("#startdate").html("Start date : " + timeConverter(map.parameters.startdate));
-                $("#enddate").html("End date : " + timeConverter(map.parameters.enddate));
-                $("#magcutoff").html("Cutoff magnitude : " + map.parameters.mag);
-            }
-            loadCountFile();
+            );
+            geojsonTileLayer.addTo(map.leafletMap);
 
         }
     };
 
 
     function getURLParameter(name) {
-        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null;
     }
 
     //time stamp conversion
@@ -258,17 +278,16 @@ var map2D = (function () {
             console.log(array);
             var length = array.length;
             console.log(length);
-            magarray = new Array();
+            magarray = [];
             for (var i = 99; i >= 0; i--) {
-                magarray[i] = new Array();
+                magarray[i] = [];
                 for (var j = 0; j < length / 102; j++) {
-                    if (magarray[i][j] != undefined) magarray[i][j] = parseInt(array[(j * 102) + 2 + i]) + parseInt(magarray[i][j]);
+                    if (magarray[i][j] !== undefined) magarray[i][j] = parseInt(array[(j * 102) + 2 + i]) + parseInt(magarray[i][j]);
                     else magarray[i][j] = parseInt(array[(j * 102) + 2 + i]);
                     if (j + 1 < length / 102) magarray[i][j + 1] = parseInt(magarray[i][j]);
                     if (i < 99) magarray[i][j] = parseInt(magarray[i + 1][j]) + parseInt(magarray[i][j]);
                 }
             }
-            console.log(magarray);
         });
     }
 
@@ -291,10 +310,6 @@ var map2D = (function () {
             [50, 40],
             [-20, -40]
         ]);
-        map.leafletMap.setMaxBounds([
-            [-90, 180],
-            [90, -180]
-        ]);
 
         controller.timeLine.timeScale(controller.speed);
         controller.timeLine.pause();
@@ -306,7 +321,7 @@ var map2D = (function () {
         setTimeout(function () {
             map.leafletMap.invalidateSize();
         }, 1);
-        controller.timeLine.resume();
+        // controller.timeLine.resume();
 
 
     });

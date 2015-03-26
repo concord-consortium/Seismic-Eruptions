@@ -292,6 +292,25 @@ var map2D = (function () {
                     }
                 }
             );
+
+            var spinnerOpts = {
+                lines: 13,
+                length: 10,
+                width: 7,
+                radius: 10,
+                top: '37px',
+                left: '70px',
+                color: '#cccccc',
+                shadow: true
+            };
+            geojsonTileLayer.on('loading', function (event) {
+                map.leafletMap.spin(true, spinnerOpts);
+            });
+
+            geojsonTileLayer.on('load', function (event) {
+                map.leafletMap.spin(false);
+            });
+
             geojsonTileLayer.addTo(map.leafletMap);
 
         }

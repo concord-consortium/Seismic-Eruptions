@@ -201,29 +201,72 @@ var map2D = (function () {
                 return '???';
             };
 
-            // var geojsonURL = '//static.local/seismic/tiles/{z}/{x}/{y}.json';
-            var geojsonURL = function(tilePoint) {
-                var tileSize = this.options.tileSize,
+            var getCurrentLimit = function(zoom, tileSize) {
+                var numTiles = Math.pow(2, zoom);
+                if (zoom === 0) {
+                    return 15000;
+                } else if (zoom <= 3) {
+                    return Math.floor(20000 / Math.pow(numTiles,2));
+                }
+                // Figure out how many tiles are actually displaying, and limit based on that
+                var bounds = map.leafletMap.getBounds(),
+                    nw = bounds.getNorthWest(),
+                    se = bounds.getSouthEast(),
+                    nwPixel = map.leafletMap.project(nw),
+                    sePixel = map.leafletMap.project(se),
+                    nwTile = nwPixel.divideBy(tileSize),
+                    seTile = sePixel.divideBy(tileSize),
+                    left = Math.floor(nwTile.x),
+                    right = Math.floor(seTile.x),
+                    top = Math.floor(nwTile.y),
+                    bottom = Math.floor(seTile.y),
+                    width, height;
+
+                // debugger;
+                // Factor in world wrapping
+                if (left > right) {
+                    left = left - numTiles;
+                }
+                if (top > bottom) {
+                    top = top - numTiles;
+                }
+
+                width = right - left;
+                height = bottom - top;
+
+                return Math.floor(15000/(width*height));
+            };
+
+            var getCurrentMag = function(zoom) {
+                     if (zoom > 8) { return 2; }
+                else if (zoom > 6) { return 3; }
+                else if (zoom > 3) { return 4; }
+                else               { return 5; }
+            };
+
+            var geojsonURL = function(tileInfo) {
+                var tileSize = tileInfo.tileSize,
+                    tilePoint = L.point(tileInfo.x, tileInfo.y),
                     nwPoint = tilePoint.multiplyBy(tileSize),
                     sePoint = nwPoint.add(new L.Point(tileSize, tileSize)),
-                    nw = this._map.unproject(nwPoint),
-                    se = this._map.unproject(sePoint),
-                    zoom = this._getZoomForUrl(),
-                    num_tiles = Math.pow(2, zoom),
-                    current_mag = 7 - (zoom <= 3 ? 0 : ((zoom-3)/2));
+                    nw = map.leafletMap.unproject(nwPoint),
+                    se = map.leafletMap.unproject(sePoint),
+                    zoom = tileInfo.z;
 
-                var url = 'http://comcat.cr.usgs.gov/fdsnws/event/1/query?starttime=1900/1/1%0000:00:00&endtime=2015/3/25%0000:00:00&eventtype=earthquake&orderby=time-asc&format=geojson' +
-                         '&minmagnitude=' + current_mag +
+                var url = '&limit=' + getCurrentLimit(zoom, tileSize) +
+                         '&minmagnitude=' + getCurrentMag(zoom) +
                          '&minlatitude=' + se.lat +
                          '&maxlatitude=' + nw.lat +
                          '&minlongitude=' + nw.lng +
                          '&maxlongitude=' + se.lng +
-                         '&callback=' + tilePoint.requestId;
+                         '&callback=' + tileInfo.requestId;
                 return url;
             };
-            var geojsonTileLayer = new L.TileLayer.GeoJSONP(geojsonURL, {
+
+            var geojsonTileLayer = new L.TileLayer.GeoJSONP('http://comcat.cr.usgs.gov/fdsnws/event/1/query?starttime=1900/1/1%0000:00:00&eventtype=earthquake&orderby=time&format=geojson{url_params}', {
+                    url_params: geojsonURL,
                     clipTiles: false,
-                    wrapPoints: true
+                    wrapPoints: false
                 }, {
                     pointToLayer: function (feature, latlng) {
                         return L.circleMarker(latlng, style);

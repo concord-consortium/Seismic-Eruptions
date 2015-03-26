@@ -7,9 +7,6 @@ exports.config =
         '3D/app-3d.js': /^app[\\\/]scripts[\\\/]3D/
         '2D/vendor-2d.js': /^vendor[\\\/]scripts[\\\/]2D/
         '3D/vendor-3d.js': /^vendor[\\\/]scripts[\\\/]3D/
-      before: [
-        'vendor/scripts/2D/TileLayer.CustomUrl.js'
-      ]
     stylesheets:
       joinTo:
         '2D/app-2d.css': /^app[\\\/]styles[\\\/]2D/

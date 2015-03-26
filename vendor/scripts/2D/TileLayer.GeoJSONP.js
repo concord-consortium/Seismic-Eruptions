@@ -71,18 +71,24 @@ L.TileLayer.Req = L.TileLayer.extend({
         this._adjustTilePoint(tilePoint);
         var layer = this;
         var req = 'req_' + Math.random().toString(36).substr(2, 8); // a random alphanumeric id
-        tilePoint.requestId = req;
+        this.options.requestId = req;
         this._requests.push(req);
         this._appendRequest(req, layer, tile, tilePoint);
     },
     _reset: function () {
+        var resetRequest = function(id) {
+            if (typeof(window[id]) === 'function') {
+                window[id] = function() {
+                    var elem = document.getElementById(id);
+                    document.body.removeChild(elem);
+                    delete window[id];
+                };
+            }
+        };
         L.TileLayer.prototype._reset.apply(this, arguments);
         for (var i in this._requests) {
-            try {
-                var elem = document.getElementById(this._requests[i]);
-                document.body.removeChild(elem);
-                delete window[this._requests[i]];
-            } catch (e) {}
+            var id = this._requests[i];
+            resetRequest(id);
         }
         this._requests = [];
     },

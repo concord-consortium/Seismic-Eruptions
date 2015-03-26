@@ -417,22 +417,63 @@ var map2D = (function () {
         controller.timeLine.pause();
     });
 
+    /////////// Quake Count info controls /////////
+    $('#daterange').dateRangeSlider({
+        arrows: false,
+        bounds: {
+            min: new Date(1900, 0, 1),
+            max: Date.now()
+        },
+        defaultValues: {
+            min: new Date(1900, 0, 1),
+            max: Date.now()
+        },
+        scales: [{
+            next: function(value) {
+                var next = new Date(value);
+                return new Date(next.setYear(value.getFullYear()+20));
+            },
+            label: function(value) {
+                return value.getFullYear();
+            }
+        }]
+    });
+    var formatDate = function(date) {
+        return date.getFullYear() + '/' + (date.getMonth()+1) + '/' + date.getDate();
+    };
 
-    var select1 = document.getElementById('date-1-y');
-    var select2 = document.getElementById('date-2-y');
-    var year = 1960;
-    while (year != 2015) {
-        var option1, option2;
-        option1 = document.createElement("option");
-        option1.setAttribute("value", parseInt(year) - 1900);
-        option1.innerHTML = year;
-        select1.appendChild(option1);
-        option2 = document.createElement("option");
-        option2.setAttribute("value", parseInt(year) - 1900);
-        option2.innerHTML = year;
-        select2.appendChild(option2);
-        year = parseInt(year) + 1;
-    }
+
+    var geojsonParams = function() {
+        var bounds = map.leafletMap.getBounds(),
+                    nw = bounds.getNorthWest(),
+                    se = bounds.getSouthEast(),
+                    mag = $('#magnitude-slider').val();
+
+        var url = '&minmagnitude=' + mag +
+                 '&minlatitude=' + se.lat +
+                 '&maxlatitude=' + nw.lat +
+                 '&minlongitude=' + nw.lng +
+                 '&maxlongitude=' + se.lng +
+                 '&callback=updateQuakeCount';
+        return url;
+    };
+    $('#getQuakeCount').click(function() {
+        $(this).addClass('ui-disabled');
+        $('#quake-count').html("Earthquakes: ???");
+        var range = $('#daterange').dateRangeSlider('values'),
+          starttime = formatDate(range.min),
+          endtime = formatDate(range.max);
+        var elem = document.createElement('script');
+        elem.src = 'http://comcat.cr.usgs.gov/fdsnws/event/1/count?starttime=' + starttime + '&endtime=' + endtime + '&eventtype=earthquake&format=geojson' + geojsonParams();
+        elem.id = 'quake-count-script';
+        document.body.appendChild(elem);
+    });
+    window.updateQuakeCount = function(result) {
+        $('#quake-count').html("Earthquakes: " + result.count);
+        var elem = document.getElementById('quake-count-script');
+        document.body.removeChild(elem);
+        $('#getQuakeCount').removeClass('ui-disabled');
+    };
     /////////// Drawing Controls ///////////
 
 

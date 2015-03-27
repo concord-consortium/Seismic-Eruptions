@@ -470,7 +470,19 @@ var map2D = (function () {
         var bounds = map.leafletMap.getBounds(),
                     nw = bounds.getNorthWest(),
                     se = bounds.getSouthEast(),
-                    mag = $('#magnitude-slider').val();
+                    mag = $('#magnitude-slider').val(),
+                    latSpan = nw.lat - se.lat,
+                    lngSpan = se.lng - nw.lng;
+
+        if (latSpan >= 180 || latSpan <= -180) {
+            nw.lat = 90;
+            se.lat = -90;
+        }
+
+        if (lngSpan >= 180 || lngSpan <= -180) {
+            nw.lng = -180;
+            se.lng = 180;
+        }
 
         var url = '&minmagnitude=' + mag +
                  '&minlatitude=' + se.lat +

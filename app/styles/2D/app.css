@@ -43,3 +43,7 @@
 .ui-mobile .ui-page {
   min-height: 100%;
 }
+
+.ui-datepicker {
+  z-index: 1199 !important
+}

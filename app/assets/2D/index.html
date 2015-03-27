@@ -55,16 +55,18 @@
 								</div>
             </div>
             <div data-role="popup" data-theme="b" class='ui-content' id="options">
-							<div class="ui-body ui-body-b" style="min-width: 400px; min-height: 300px;">
+							<div class="ui-body ui-body-b" style="min-width: 400px; min-height: 300px; overflow: visible;">
 								<div data-theme="b" data-role="header">
 									Check Quake Count
 								</div>
 								<div class="ui-bar ui-bar-a" id="quake-count"></div>
 								<div style="padding:10px 20px;" data-theme="b">
 									<div id="daterange"></div>
+									<div id="daterange-picker-left" style="float: left; display: none;"></div>
+									<div id="daterange-picker-right" style="float: left; display: none;"></div>
 									<div style="padding-top: 10px;">
 										<label for='magnitude-slider'>Magnitude cutoff:</label>
-										<input id="magnitude-slider" name="magnitude-slider2" type="range" min="1" max="9" value="5" >
+										<input id="magnitude-slider" name="magnitude-slider2" type="range" min="1" max="9" value="5" step=".1" >
 									</div>
 									<a href="#" class="ui-btn ui-btn-b ui-btn-inline ui-shadow ui-corner-all ui-mini ui-icon-check ui-btn-icon-right" id="getQuakeCount"> Get Count </a>
 								</div>

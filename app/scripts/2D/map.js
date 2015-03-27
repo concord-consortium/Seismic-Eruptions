@@ -438,6 +438,29 @@ var map2D = (function () {
             }
         }]
     });
+
+    $.datepicker.setDefaults({
+        minDate: new Date(1900,0,1),
+        maxDate: 0,
+        changeMonth: true,
+        changeYear: true
+    });
+    var minSelected = function(dateText) {
+        var prevVals = $('#daterange').dateRangeSlider('values'),
+            newDate = new Date(dateText);
+        $('#daterange').dateRangeSlider('values', newDate, prevVals.max);
+    };
+    var maxSelected = function(dateText) {
+        var prevVals = $('#daterange').dateRangeSlider('values'),
+            newDate = new Date(dateText);
+        $('#daterange').dateRangeSlider('values', prevVals.min, newDate);
+    };
+    $('.ui-rangeSlider-leftLabel').click(function(evt) {
+        $('.ui-rangeSlider-leftLabel').datepicker('dialog', $('#daterange').dateRangeSlider('values').min, minSelected, {}, evt);
+    });
+    $('.ui-rangeSlider-rightLabel').click(function(evt) {
+        $('.ui-rangeSlider-rightLabel').datepicker('dialog', $('#daterange').dateRangeSlider('values').max, maxSelected, {}, evt);
+    });
     var formatDate = function(date) {
         return date.getFullYear() + '/' + (date.getMonth()+1) + '/' + date.getDate();
     };

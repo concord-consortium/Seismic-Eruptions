@@ -1,117 +1,125 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Seismic Eruptions</title>
-        <meta http-equiv='Content-Type' content='text/html, charset=utf-8'/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densityDpi=device-dpi"/>
-		<link rel="stylesheet" href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-		<link rel="stylesheet" href="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
-		<!--<link rel="stylesheet" href="../../../vendor/styles/font-awesome.css" />
-		<link rel="stylesheet" href="../../../vendor/styles/leaflet.draw.css" />-->
+  <head>
+    <title>Seismic Eruptions</title>
+    <meta http-equiv='Content-Type' content='text/html, charset=utf-8'/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densityDpi=device-dpi"/>
 
-		<link rel="stylesheet" href="vendor-2d.css" />
-		<link rel="stylesheet" href="app-2d.css" />
-        <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-				<script src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-        <script src="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
-				<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.12/jquery.mousewheel.min.js"></script>
-		    <script src="//fgnass.github.io/spin.js/spin.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
-        <script src="vendor-2d.js"></script>
-		<style>
-			.ui-content {
-				position: absolute;
-				top: 40px;
-				right: 0;
-				bottom: 0;
-				left: 0;
-				padding: 0;
-			}
-			#map {
-				height: 100%;
-				position:absolute;
-				top:0;
-				bottom:0;
-				left:0;
-				right:0;
-				margin: 0;
-				padding: 0;
-			}
-			.ui-icon-knife:after {
-				background-image: url("../images/knife-dashed-line.png");
-				background-size: 18px 18px;
-			}
-		</style>
-    </head>
-    <body>
-        <div data-role="page" id="index">
-            <div data-theme="b" data-role="header">
-                <h1>Seismic Eruptions</h1>
-								<a href="#options" data-rel='popup' data-transition="slidedown" class="ui-btn ui-icon-info ui-mini ui-btn-icon-notext ui-corner-all">Options</a>
-								<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right">
-									<a href="#" class="ui-btn ui-btn-b ui-icon-knife ui-mini ui-btn-icon-notext ui-corner-all" id="drawingTool" onclick="map2D.startdrawing()">Draw Cross-Section</a>
-									<a href="#settings" class="ui-btn ui-icon-gear ui-mini ui-btn-icon-notext ui-corner-all">Settings</a>
-								</div>
-            </div>
-            <div data-role="popup" data-theme="b" class='ui-content' id="options">
-							<div class="ui-body ui-body-b" style="min-width: 400px; min-height: 300px; overflow: visible;">
-								<div data-theme="b" data-role="header">
-									Check Quake Count
-								</div>
-								<div class="ui-bar ui-bar-a" id="quake-count"></div>
-								<div style="padding:10px 20px;" data-theme="b">
-									<div id="daterange"></div>
-									<div id="daterange-picker-left" style="float: left; display: none;"></div>
-									<div id="daterange-picker-right" style="float: left; display: none;"></div>
-									<div style="padding-top: 10px;">
-										<label for='magnitude-slider'>Magnitude cutoff:</label>
-										<input id="magnitude-slider" name="magnitude-slider2" type="range" min="1" max="9" value="5" step=".1" >
-									</div>
-									<a href="#" class="ui-btn ui-btn-b ui-btn-inline ui-shadow ui-corner-all ui-mini ui-icon-check ui-btn-icon-right" id="getQuakeCount"> Get Count </a>
-								</div>
-							</div>
-						</div>
-						 <div data-role="panel" data-position="right" data-display="overlay" data-theme="b" id="settings">
-							<form>
-								<div class="ui-field-contain">
-									<label for="plates">Plate-boundaries</label>
-									<input data-role="flipswitch" data-mini="true" type="checkbox" name="plates" id="plates" onchange="map2D.plateToggle()">
-								</div>
-								<div class="ui-field-contain ui-mini">
-									<select name="mapselector" id="mapselector" data-native-menu="false" data-mini="true">
-										<option value="1">PRCC Earthquake density map</option>
-										<option value="2" selected>Satellite map</option>
-										<option value="3">OSM map</option>
-									</select>
-								</div>
-							</form>
-						</div>
+    <link rel="stylesheet" type='text/css' href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" type='text/css' href="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
+    <link rel="stylesheet" type='text/css' href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+    <!--<link rel="stylesheet" type='text/css' href="../../../vendor/styles/font-awesome.css" />
+    <link rel="stylesheet" type='text/css' href="../../../vendor/styles/leaflet.draw.css" />-->
+    <link rel="stylesheet" type='text/css' href="vendor-2d.css" />
+    <link rel="stylesheet" type='text/css' href="app-2d.css" />
+    <style type='text/css'>
+      .ui-content {
+        position: absolute;
+        top: 40px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+        position:absolute;
+        top:0;
+        bottom:0;
+        left:0;
+        right:0;
+        margin: 0;
+        padding: 0;
+      }
+      .ui-icon-knife:after {
+        background-image: url("../images/knife-dashed-line.png");
+        background-size: 18px 18px;
+      }
+    </style>
 
-            <div data-role="content" data-theme="b">
-                <div id="map"></div>
-				<div class="ui-bar ui-body-b" style="width:100%;bottom:0px;left:0px;position:absolute"  id="playback">
-					<div class="ui-grid-d" id="playcontrols">
-						<div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-play ui-corner-all" id="play"></a></div>
-						<div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-pause ui-corner-all" id="pause"></a></div>
-						<div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-forward ui-corner-all" id="speedup"></a></div>
-						<div class="ui-block-d"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-backward ui-corner-all" id="speeddown"></a></div>
-					</div>
-					<div class="ui-grid-a">
-						<div class="ui-block-a"><div id="slider" style="height:10px;width:90%"></div></div>
-						<div class="ui-block-b" id="date"></div>
-					</div>
-				</div>
-				<div class="ui-bar ui-mini ui-body-b" style="width:100%;bottom:0px;position:absolute;display:none" id="crosssection">
-					<a class="ui-btn ui-btn-inline" onclick="map2D.render()">View Cross Section</a>
-					<a class="ui-btn ui-btn-inline" onclick="map2D.editdrawing()">Edit</a>
-					<a class="ui-btn ui-btn-inline" onclick="map2D.editsave()">Save</a>
-					<a class="ui-btn ui-btn-inline" onclick="map2D.backtonormalview()" id="drawingToolDone">Done</a>
-				</div>
-			</div>
-			
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script type="text/javascript" src="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.12/jquery.mousewheel.min.js"></script>
+    <script type="text/javascript" src="//fgnass.github.io/spin.js/spin.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+    <script type="text/javascript" src="vendor-2d.js"></script>
+    <script type="text/javascript" src="app-2d.js"></script>
+
+  </head>
+  <body>
+    <div data-role="page" id="index">
+      <div data-theme="b" data-role="header">
+        <h1>Seismic Eruptions</h1>
+        <a href="#options" data-rel='popup' data-transition="slidedown" class="ui-btn ui-icon-info ui-mini ui-btn-icon-notext ui-corner-all">Options</a>
+        <div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right">
+          <a href="#" class="ui-btn ui-btn-b ui-icon-knife ui-mini ui-btn-icon-notext ui-corner-all" id="drawingTool" onclick="app.map.startdrawing()">Draw Cross-Section</a>
+          <a href="#settings" class="ui-btn ui-icon-gear ui-mini ui-btn-icon-notext ui-corner-all">Settings</a>
         </div>
-		<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
-		<script src="app-2d.js"></script>
-    </body>
-</html>   
+      </div>
+      <div data-role="popup" data-theme="b" class='ui-content' id="options">
+        <div class="ui-body ui-body-b" style="min-width: 400px; min-height: 300px; overflow: visible;">
+          <div data-theme="b" data-role="header">
+            Check Quake Count
+          </div>
+          <div class="ui-bar ui-bar-a" id="quake-count"></div>
+          <div style="padding:10px 20px;" data-theme="b">
+            <div id="daterange"></div>
+            <div id="daterange-picker-left" style="float: left; display: none;"></div>
+            <div id="daterange-picker-right" style="float: left; display: none;"></div>
+            <div style="padding-top: 10px;">
+              <label for='magnitude-slider'>Magnitude cutoff:</label>
+              <input id="magnitude-slider" name="magnitude-slider2" type="range" min="1" max="9" value="5" step="0.1" >
+            </div>
+            <a href="#" class="ui-btn ui-btn-b ui-btn-inline ui-shadow ui-corner-all ui-mini ui-icon-check ui-btn-icon-right" id="getQuakeCount"> Get Count </a>
+          </div>
+        </div>
+      </div>
+       <div data-role="panel" data-position="right" data-display="overlay" data-theme="b" id="settings">
+        <form>
+          <div class="ui-field-contain">
+            <label for="plates">Plate-boundaries</label>
+            <input data-role="flipswitch" data-mini="true" type="checkbox" name="plates" id="plates" onchange="app.map.plateToggle()">
+          </div>
+          <div class="ui-field-contain ui-mini">
+            <select name="mapselector" id="mapselector" data-native-menu="false" data-mini="true">
+              <option value="1">PRCC Earthquake density map</option>
+              <option value="2" selected>Satellite map</option>
+              <option value="3">OSM map</option>
+            </select>
+          </div>
+        </form>
+      </div>
+
+      <div data-role="content" data-theme="b">
+        <div id="map"></div>
+        <div class="ui-bar ui-body-b" style="width:100%;bottom:0px;left:0px;position:absolute"  id="playback">
+          <div class="ui-grid-d" id="playcontrols">
+            <div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-play ui-corner-all" id="play"></a></div>
+            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-pause ui-corner-all" id="pause"></a></div>
+            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-forward ui-corner-all" id="speedup"></a></div>
+            <div class="ui-block-d"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-backward ui-corner-all" id="speeddown"></a></div>
+          </div>
+          <div class="ui-grid-a">
+            <div class="ui-block-a"><div id="slider" style="height:10px;width:90%"></div></div>
+            <div class="ui-block-b" id="date"></div>
+          </div>
+        </div>
+        <div class="ui-bar ui-mini ui-body-b" style="width:100%;bottom:0px;position:absolute;display:none" id="crosssection">
+          <a class="ui-btn ui-btn-inline" onclick="app.map.render()">View Cross Section</a>
+          <a class="ui-btn ui-btn-inline" onclick="app.map.editdrawing()">Edit</a>
+          <a class="ui-btn ui-btn-inline" onclick="app.map.editsave()">Save</a>
+          <a class="ui-btn ui-btn-inline" onclick="app.map.backtonormalview()" id="drawingToolDone">Done</a>
+        </div>
+      </div>
+
+    </div>
+    <script  type="text/javascript">
+      var App = require('2D/app'),
+          app = new App(); // some comment
+
+      app.init();
+    </script>
+  </body>
+</html>

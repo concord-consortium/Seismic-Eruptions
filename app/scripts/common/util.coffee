@@ -43,4 +43,7 @@ class Util
     time = year+' '+month+' '+date
     return time
 
+  usgsDate: (date) ->
+    return date.getFullYear() + '/' + (date.getMonth()+1) + '/' + date.getDate()
+
 module.exports = new Util()

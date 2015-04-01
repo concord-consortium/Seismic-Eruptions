@@ -70,7 +70,9 @@ class MapController
 
   _getCurrentMag: (zoom) ->
     mag = @_getDesiredMag(zoom)
-    @map.parameters.mag = mag
+    if @map.parameters.mag isnt mag
+      @map.parameters.mag = mag
+      $('#magnitude-slider').val(mag).slider('refresh')
     return mag
 
   _getDesiredMag: (zoom) ->
@@ -155,61 +157,9 @@ class MapController
     }
 
     if @map.parameters.timeline
-      loader = new DataLoader()
-      if @map.parameters.data?
-        promise = loader.load(@map.parameters.data, {ajax: true})
-      else if @map.parameters.datap? and @map.parameters.datap_callback?
-        promise = loader.load(@map.parameters.datap, {callback: @map.parameters.datap_callback})
-      else
-        promise = loader.load('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time-asc&format=geojson' + @_geojsonURL())
-      promise.then (results) =>
-        @map.values.size = results.features.length
-
-        for feature,i in results.features
-          @map.earthquakes.circles[i] = L.geoJson feature,
-            pointToLayer: (feature, latlng) ->
-              return L.circleMarker(latlng, style)
-            style: style
-            onEachFeature: (feature, layer) =>
-              depth = @_getDepth(feature)
-              layer.setStyle({
-                radius: feature.properties.mag,
-                fillColor: "#" + @rainbow.colourAt(depth)
-              })
-              if feature.properties?
-                layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + @util.timeConverter(feature.properties.time) + "</br>Depth : " + depth + " km")
-              if !(layer instanceof L.Point)
-                layer.on 'mouseover', ->
-                  layer.setStyle(hoverStyle)
-                layer.on 'mouseout', ->
-                  layer.setStyle(unhoverStyle)
-
-            @map.earthquakes.time[i] = feature.properties.time
-            @map.earthquakes.depth[i] = feature.geometry.coordinates[2]
-
-            # add events to timeline
-            delay = if i is 0 then 0 else 20 * ((feature.properties.time - results.features[i - 1].properties.time) / 1000000000)
-            @timeLine.append(TweenLite.delayedCall(delay, ((i)=> @map.mapAdder(i)), [i.toString()]))
-
-        @map.values.timediff = results.features[@map.values.size - 1].properties.time - results.features[0].properties.time
-        @map.parameters.starttime = results.features[0].properties.time
-
-        $('#slider-wrapper').html "<input id='slider' name='slider' type='range' min='0' max='#{@map.values.timediff}' value='0' step='1' style='display: none;'>"
-        $("#slider").slider
-          slidestart: (event) =>
-            @timeLine.pause()
-          slidestop: (event) =>
-            $("#date").html(@util.timeConverter(@map.parameters.starttime))
-            @timeLine.progress($("#slider").val() / (@map.values.timediff))
-
-        $("#info").html("</br></br>total earthquakes : " + @map.values.size + "</br>minimum depth : " + @map.values.mindepth + " km</br>maximum depth : " + @map.values.maxdepth + " km</br></br></br><div class='ui-body ui-body-a'><p><a href='http://github.com/gizmoabhinav/Seismic-Eruptions'>Link to the project</a></p></div>")
-        $("#startdate").html("Start date : " + @util.timeConverter(@map.parameters.startdate))
-        $("#enddate").html("End date : " + @util.timeConverter(@map.parameters.enddate))
-        $("#magcutoff").html("Cutoff magnitude : " + @map.parameters.mag)
-
-        @timeLine.resume() if @map.parameters.timeline
+      @_loadStaticData(style, hoverStyle, unhoverStyle, spinnerOpts)
     else
-      geojsonTileLayer = new L.TileLayer.GeoJSONP('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time&format=geojson{url_params}',
+      @geojsonTileLayer = new L.TileLayer.GeoJSONP('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time&format=geojson{url_params}',
         {
           url_params: (tileInfo) => @_geojsonURL(tileInfo),
           clipTiles: false,
@@ -234,12 +184,82 @@ class MapController
         }
       )
 
-      geojsonTileLayer.on 'loading', (event) =>
+      @geojsonTileLayer.on 'loading', (event) =>
         @map.leafletMap.spin(true, spinnerOpts)
 
-      geojsonTileLayer.on 'load', (event) =>
+      @geojsonTileLayer.on 'load', (event) =>
         @map.leafletMap.spin(false)
 
-      geojsonTileLayer.addTo(@map.leafletMap)
+      @geojsonTileLayer.addTo(@map.leafletMap)
+
+  reloadData: ->
+    if @map.parameters.timeline
+      # Clear the old points, request the new ones
+      @timeLine.pause()
+      for circle in @map.earthquakes.circles
+        @leafletMap.removeLayer(circle) if @leafletMap.hasLayer(circle)
+      @map.earthquakes.circles = []
+      @map.earthquakes.time = []
+      @map.earthquakes.depth = []
+      @_loadStaticData()
+    else
+      @geojsonTileLayer.redraw()
+
+  _loadStaticData: (style, hoverStyle, unhoverStyle, spinnerOpts) ->
+    @timeLine.pause()
+    loader = new DataLoader()
+    if @map.parameters.data?
+      promise = loader.load(@map.parameters.data, {ajax: true})
+    else if @map.parameters.datap? and @map.parameters.datap_callback?
+      promise = loader.load(@map.parameters.datap, {callback: @map.parameters.datap_callback})
+    else
+      promise = loader.load('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time-asc&format=geojson' + @_geojsonURL())
+    promise.then (results) =>
+      @map.values.size = results.features.length
+
+      for feature,i in results.features
+        @map.earthquakes.circles[i] = L.geoJson feature,
+          pointToLayer: (feature, latlng) ->
+            return L.circleMarker(latlng, style)
+          style: style
+          onEachFeature: (feature, layer) =>
+            depth = @_getDepth(feature)
+            layer.setStyle({
+              radius: feature.properties.mag,
+              fillColor: "#" + @rainbow.colourAt(depth)
+            })
+            if feature.properties?
+              layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + @util.timeConverter(feature.properties.time) + "</br>Depth : " + depth + " km")
+            if !(layer instanceof L.Point)
+              layer.on 'mouseover', ->
+                layer.setStyle(hoverStyle)
+              layer.on 'mouseout', ->
+                layer.setStyle(unhoverStyle)
+
+          @map.earthquakes.time[i] = feature.properties.time
+          @map.earthquakes.depth[i] = feature.geometry.coordinates[2]
+
+          # add events to timeline
+          delay = if i is 0 then 0 else 20 * ((feature.properties.time - results.features[i - 1].properties.time) / 1000000000)
+          @timeLine.append(TweenLite.delayedCall(delay, ((i)=> @map.mapAdder(i)), [i.toString()]))
+
+      if @map.values.size > 0
+        @map.values.timediff = results.features[@map.values.size - 1].properties.time - results.features[0].properties.time
+        @map.parameters.starttime = results.features[0].properties.time
+
+        $('#slider-wrapper').html "<input id='slider' name='slider' type='range' min='0' max='#{@map.values.timediff}' value='0' step='1' style='display: none;'>"
+        $("#slider").slider
+          slidestart: (event) =>
+            @timeLine.pause()
+          slidestop: (event) =>
+            $("#date").html(@util.timeConverter(@map.parameters.starttime))
+            @timeLine.progress($("#slider").val() / (@map.values.timediff))
+
+        $("#info").html("</br></br>total earthquakes : " + @map.values.size + "</br>minimum depth : " + @map.values.mindepth + " km</br>maximum depth : " + @map.values.maxdepth + " km</br></br></br><div class='ui-body ui-body-a'><p><a href='http://github.com/gizmoabhinav/Seismic-Eruptions'>Link to the project</a></p></div>")
+        $("#startdate").html("Start date : " + @util.timeConverter(@map.parameters.startdate))
+        $("#enddate").html("End date : " + @util.timeConverter(@map.parameters.enddate))
+        $("#magcutoff").html("Cutoff magnitude : " + @map.parameters.mag)
+
+        @timeLine.resume()
 
 module.exports = MapController

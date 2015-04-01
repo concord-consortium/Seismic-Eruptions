@@ -3,6 +3,7 @@ MapController = require '2D/map-controller'
 
 class App
   constructor: ->
+    @util = require 'common/util'
     @map = new Map()
     @controller = new MapController(@map)
 
@@ -25,6 +26,8 @@ class App
       setTimeout =>
         @map.leafletMap.invalidateSize()
       , 1
+
+      @init()
 
   init: ->
     # buttons
@@ -56,11 +59,11 @@ class App
     $('#daterange').dateRangeSlider
       arrows: false
       bounds:
-        min: new Date(1900, 0, 1)
+        min: new Date(1900,0,1)
         max: Date.now()
       defaultValues:
-        min: new Date(1900, 0, 1)
-        max: Date.now()
+        min: new Date(@map.parameters.startdate)
+        max: new Date(@map.parameters.enddate)
       scales: [
         {
           next: (value) ->
@@ -70,6 +73,8 @@ class App
             return value.getFullYear()
         }
       ]
+
+    $('#magnitude-slider').val(@map.parameters.desiredMag || @map.parameters.mag).slider('refresh')
 
     $.datepicker.setDefaults
       minDate: new Date(1900,0,1)
@@ -93,17 +98,14 @@ class App
     $('.ui-rangeSlider-rightLabel').click (evt) ->
       $('.ui-rangeSlider-rightLabel').datepicker('dialog', $('#daterange').dateRangeSlider('values').max, maxSelected, {}, evt)
 
-    formatDate = (date) ->
-      return date.getFullYear() + '/' + (date.getMonth()+1) + '/' + date.getDate()
-
     elem = null
     $('#getQuakeCount').click =>
       $(this).addClass('ui-disabled')
       $('#quake-count').html("Earthquakes: ???")
 
       range = $('#daterange').dateRangeSlider('values')
-      starttime = formatDate(range.min)
-      endtime = formatDate(range.max)
+      starttime = @util.usgsDate(range.min)
+      endtime = @util.usgsDate(range.max)
 
       elem = document.createElement('script')
       elem.src = 'http://comcat.cr.usgs.gov/fdsnws/event/1/count?starttime=' + starttime + '&endtime=' + endtime + '&eventtype=earthquake&format=geojson' + @geojsonParams()
@@ -112,9 +114,17 @@ class App
 
     window.updateQuakeCount = (result) ->
       $('#quake-count').html("Earthquakes: " + result.count)
-      velem = document.getElementById('quake-count-script')
+      elem = document.getElementById('quake-count-script')
       document.body.removeChild(elem)
       $('#getQuakeCount').removeClass('ui-disabled')
+
+    $('#loadSelectedData').click =>
+      range = $('#daterange').dateRangeSlider('values')
+      @map.parameters.startdate = @util.usgsDate(range.min)
+      @map.parameters.enddate = @util.usgsDate(range.max)
+      @map.parameters.desiredMag = $('#magnitude-slider').val()
+      @controller.reloadData()
+
 
     ########### Drawing Controls ###########
     if @map.parameters.timeline

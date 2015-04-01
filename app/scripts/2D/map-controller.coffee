@@ -112,8 +112,8 @@ class MapController
     return url
 
   _updateSlider: ->
-    $("#slider").slider("value", (@timeLine.progress() * @map.values.timediff))
-    $("#date").html(util.timeConverter((@timeLine.progress() * @map.values.timediff) + @map.parameters.starttime))
+    $("#slider").val(Math.ceil(@timeLine.progress() * @map.values.timediff)).slider('refresh')
+    $("#date").html(@util.timeConverter((@timeLine.progress() * @map.values.timediff) + @map.parameters.starttime))
 
   initController: ->
     #  colour gradient generator
@@ -151,7 +151,7 @@ class MapController
 
     if @map.parameters.timeline
       loader = new DataLoader()
-      loader.load('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time&format=geojson' + @_geojsonURL()).then (results) =>
+      loader.load('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time-asc&format=geojson' + @_geojsonURL()).then (results) =>
         @map.values.size = results.features.length
 
         for feature,i in results.features
@@ -183,20 +183,20 @@ class MapController
         @map.values.timediff = results.features[@map.values.size - 1].properties.time - results.features[0].properties.time
         @map.parameters.starttime = results.features[0].properties.time
 
+        $('#slider-wrapper').html "<input id='slider' name='slider' type='range' min='0' max='#{@map.values.timediff}' value='0' step='1' style='display: none;'>"
         $("#slider").slider
-          value: 0
-          range: "min"
-          min: 0
-          max: @map.values.timediff
-          slide: (event, ui) =>
-            $("#date").html(@util.timeConverter(@map.parameters.starttime))
+          slidestart: (event) =>
             @timeLine.pause()
-            @timeLine.progress(ui.value / (@map.values.timediff))
+          slidestop: (event) =>
+            $("#date").html(@util.timeConverter(@map.parameters.starttime))
+            @timeLine.progress($("#slider").val() / (@map.values.timediff))
 
         $("#info").html("</br></br>total earthquakes : " + @map.values.size + "</br>minimum depth : " + @map.values.mindepth + " km</br>maximum depth : " + @map.values.maxdepth + " km</br></br></br><div class='ui-body ui-body-a'><p><a href='http://github.com/gizmoabhinav/Seismic-Eruptions'>Link to the project</a></p></div>")
         $("#startdate").html("Start date : " + @util.timeConverter(@map.parameters.startdate))
         $("#enddate").html("End date : " + @util.timeConverter(@map.parameters.enddate))
         $("#magcutoff").html("Cutoff magnitude : " + @map.parameters.mag)
+
+        @timeLine.resume() if @map.parameters.timeline
     else
       geojsonTileLayer = new L.TileLayer.GeoJSONP('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time&format=geojson{url_params}',
         {

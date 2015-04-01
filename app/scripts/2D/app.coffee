@@ -21,32 +21,30 @@ class App
         @map.leafletMap.invalidateSize()
       , 1
 
-      @controller.timeLine.resume() if @map.parameters.timeline
-
   init: ->
     # buttons
-    $('#play').click ->
+    $('#play').click =>
       @controller.timeLine.resume()
 
-    $('#pause').click ->
+    $('#pause').click =>
       @controller.timeLine.pause()
 
-    $('#speedup').click ->
+    $('#speedup').click =>
       @controller.speed *= 1.5
       @controller.timeLine.timeScale(@controller.speed)
 
-    $('#speeddown').click ->
+    $('#speeddown').click =>
       if @controller.speed >= 0.5
         @controller.speed /= 2
         @controller.timeLine.timeScale(@controller.speed)
 
-    $('#changeparams').click ->
+    $('#changeparams').click =>
       @controller.timeLine.pause()
 
-    $('#editparamscancel').click ->
+    $('#editparamscancel').click =>
       @controller.timeLine.resume()
 
-    $('#editparamsenter').click ->
+    $('#editparamsenter').click =>
       @controller.timeLine.pause()
 
     ########### Quake Count info controls #########
@@ -117,28 +115,28 @@ class App
 
     $('#index').click ->
       $('#playcontrols').fadeIn()
-      $('#slider').fadeIn()
+      $('#slider-wrapper').fadeIn()
       $('#date').fadeIn()
       setTimeout ->
         $('#playcontrols').fadeOut()
       , 5000
       setTimeout ->
-        $('#slider').fadeOut()
+        $('#slider-wrapper').fadeOut()
         $('#date').fadeOut()
       , 12000
 
     $('#playback').hover ->
       $('#playcontrols').fadeIn()
-      $('#slider').fadeIn()
+      $('#slider-wrapper').fadeIn()
       $('#date').fadeIn()
       setTimeout ->
-        $('#slider').fadeOut()
+        $('#slider-wrapper').fadeOut()
         $('#date').fadeOut()
         $('#playcontrols').fadeOut()
       , 8000
 
     setTimeout ->
-      $('#slider').fadeOut()
+      $('#slider-wrapper').fadeOut()
       $('#date').fadeOut()
       $('#playcontrols').fadeOut()
     , 10000
@@ -154,7 +152,7 @@ class App
           if !@map.leafletMap.hasLayer(@map.earthquakes.circles[i])
             @map.earthquakes.circles[i].setStyle
               fillOpacity: 0.5
-              fillColor: "#" + @rainbow.colourAt(@map.earthquakes.depth[i])
+              fillColor: "#" + @controller.rainbow.colourAt(@map.earthquakes.depth[i])
 
             @map.earthquakes.circles[i].addTo(@map.leafletMap)
 
@@ -222,11 +220,11 @@ class App
       document.getElementById("speeddown").disabled = true
       tl.pause()
 
-      for i in [0...size] by 1
+      for i in [0...(@map.values.size)] by 1
         if !@map.leafletMap.hasLayer(@map.earthquakes.circles[i])
           @map.earthquakes.circles[i].setStyle
             fillOpacity: 0.5,
-            fillColor: "#" + @rainbow.colourAt(@map.earthquakes.depth[i])
+            fillColor: "#" + @controller.rainbow.colourAt(@map.earthquakes.depth[i])
 
           @map.earthquakes.circles[i].addTo(@map.leafletMap)
 

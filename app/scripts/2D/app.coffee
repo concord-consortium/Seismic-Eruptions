@@ -117,34 +117,36 @@ class App
       $('#getQuakeCount').removeClass('ui-disabled')
 
     ########### Drawing Controls ###########
+    if @map.parameters.timeline
+      $('#index').click ->
+        $('#playcontrols').fadeIn()
+        $('#slider-wrapper').fadeIn()
+        $('#date').fadeIn()
+        setTimeout ->
+          $('#playcontrols').fadeOut()
+        , 5000
+        setTimeout ->
+          $('#slider-wrapper').fadeOut()
+          $('#date').fadeOut()
+        , 12000
 
-    $('#index').click ->
-      $('#playcontrols').fadeIn()
-      $('#slider-wrapper').fadeIn()
-      $('#date').fadeIn()
-      setTimeout ->
-        $('#playcontrols').fadeOut()
-      , 5000
+      $('#playback').hover ->
+        $('#playcontrols').fadeIn()
+        $('#slider-wrapper').fadeIn()
+        $('#date').fadeIn()
+        setTimeout ->
+          $('#slider-wrapper').fadeOut()
+          $('#date').fadeOut()
+          $('#playcontrols').fadeOut()
+        , 8000
+
       setTimeout ->
         $('#slider-wrapper').fadeOut()
         $('#date').fadeOut()
-      , 12000
-
-    $('#playback').hover ->
-      $('#playcontrols').fadeIn()
-      $('#slider-wrapper').fadeIn()
-      $('#date').fadeIn()
-      setTimeout ->
-        $('#slider-wrapper').fadeOut()
-        $('#date').fadeOut()
         $('#playcontrols').fadeOut()
-      , 8000
-
-    setTimeout ->
-      $('#slider-wrapper').fadeOut()
-      $('#date').fadeOut()
-      $('#playcontrols').fadeOut()
-    , 10000
+      , 10000
+    else
+      $('#playback').fadeOut()
 
     drawingMode = false
     $('#drawingTool').click =>
@@ -167,7 +169,7 @@ class App
     $('#drawingToolDone').click =>
       if drawingMode
         $.mobile.loading('show')
-        $('#playback').fadeIn()
+        $('#playback').fadeIn() if @map.parameters.timeline
         $('#crosssection').fadeOut()
         $.mobile.loading('hide')
         drawingMode = false

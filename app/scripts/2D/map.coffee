@@ -1,4 +1,4 @@
-CrossSection = require '2D/extensions/Draw.CrossSection'
+CrossSection = require '2D/cross-section'
 util = require 'common/util'
 
 # The map object with all the variables of current map being shown
@@ -76,24 +76,28 @@ class Map
   render: ->
     if @editing
       @editsave()
-    if @crossSection.linelength is 0
-      alert("Draw a cross-section first")
-      return
-    if @crossSection.linelength >= 1400
-      alert("cross section too long")
-      return
-    @render3DFrame("../3D/index.html?x1=" + util.toLon(@crossSection.y1) +
-      "&y1=" + util.toLat(@crossSection.x1) +
-      "&x2=" + util.toLon(@crossSection.y2) +
-      "&y2=" + util.toLat(@crossSection.x2) +
-      "&x3=" + util.toLon(@crossSection.y3) +
-      "&y3=" + util.toLat(@crossSection.x3) +
-      "&x4=" + util.toLon(@crossSection.y4) +
-      "&y4=" + util.toLat(@crossSection.x4) +
+    # TODO Do we care?
+    # if @crossSection.linelength is 0
+    #   alert("Draw a cross-section first")
+    #   return
+    # if @crossSection.linelength >= 1400
+    #   alert("cross section too long")
+    #   return
+
+    pts = @crossSection.points
+
+    @render3DFrame("../3D/index.html?x1=" + pts[0].lng +
+      "&y1=" + pts[0].lat +
+      "&x2=" + pts[1].lng +
+      "&y2=" + pts[1].lat +
+      "&x3=" + pts[2].lng +
+      "&y3=" + pts[2].lat +
+      "&x4=" + pts[3].lng +
+      "&y4=" + pts[3].lat +
       "&mag=" + @parameters.mag +
       "&startdate=" + @parameters.startdate +
       "&enddate=" + @parameters.enddate
-    )
+    ) if pts.length is 4
 
   render3DFrame: (url) ->
     frame = document.createElement("div")

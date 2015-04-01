@@ -31,10 +31,10 @@ class Plot
       '&minmagnitude='+@mag +
       '&starttime='+@startdate+'%2000:00:00' +
       '&endtime='+@enddate+'%2023:59:59' +
-      '&minlatitude='+Math.min(@limits.y1,@limits.y2,@limits.y3,@limits.y4) +
-      '&maxlatitude='+Math.max(@limits.y1,@limits.y2,@limits.y3,@limits.y4) +
-      '&minlongitude='+Math.min(@limits.x1,@limits.x2,@limits.x3,@limits.x4) +
-      '&maxlongitude='+Math.max(@limits.x1,@limits.x2,@limits.x3,@limits.x4)
+      '&minlatitude='  + Math.min(@limits.latlng.y1, @limits.latlng.y2, @limits.latlng.y3, @limits.latlng.y4) +
+      '&maxlatitude='  + Math.max(@limits.latlng.y1, @limits.latlng.y2, @limits.latlng.y3, @limits.latlng.y4) +
+      '&minlongitude=' + Math.min(@limits.latlng.x1, @limits.latlng.x2, @limits.latlng.x3, @limits.latlng.x4) +
+      '&maxlongitude=' + Math.max(@limits.latlng.x1, @limits.latlng.x2, @limits.latlng.x3, @limits.latlng.x4)
 
     loader.load(url).then (results) =>
       size = results.features.length
@@ -56,14 +56,14 @@ class Plot
       @sphereParent.position.set(0,0,0)
       @scene.add(sphereParent)
       # generate the box
-      vertex1 = new THREE.Vector3( @limits.x1-@limits.leftTileLimit-2, -@limits.y1+@limits.topTileLimit+2,1 )
-      vertex2 = new THREE.Vector3( @limits.x2-@limits.leftTileLimit-2, -@limits.y2+@limits.topTileLimit+2,1 )
-      vertex3 = new THREE.Vector3( @limits.x3-@limits.leftTileLimit-2, -@limits.y3+@limits.topTileLimit+2,1 )
-      vertex4 = new THREE.Vector3( @limits.x4-@limits.leftTileLimit-2, -@limits.y4+@limits.topTileLimit+2,1 )
-      vertex5 = new THREE.Vector3( @limits.x1-@limits.leftTileLimit-2, -@limits.y1+@limits.topTileLimit+2,1.0-(@maxdepth/1000) )
-      vertex6 = new THREE.Vector3( @limits.x2-@limits.leftTileLimit-2, -@limits.y2+@limits.topTileLimit+2,1.0-(@maxdepth/1000) )
-      vertex7 = new THREE.Vector3( @limits.x3-@limits.leftTileLimit-2, -@limits.y3+@limits.topTileLimit+2,1.0-(@maxdepth/1000) )
-      vertex8 = new THREE.Vector3( @limits.x4-@limits.leftTileLimit-2, -@limits.y4+@limits.topTileLimit+2,1.0-(@maxdepth/1000) )
+      vertex1 = new THREE.Vector3( @limits.coords.x1-@limits.coords.leftTileLimit-2, -@limits.coords.y1+@limits.coords.topTileLimit+2,1 )
+      vertex2 = new THREE.Vector3( @limits.coords.x2-@limits.coords.leftTileLimit-2, -@limits.coords.y2+@limits.coords.topTileLimit+2,1 )
+      vertex3 = new THREE.Vector3( @limits.coords.x3-@limits.coords.leftTileLimit-2, -@limits.coords.y3+@limits.coords.topTileLimit+2,1 )
+      vertex4 = new THREE.Vector3( @limits.coords.x4-@limits.coords.leftTileLimit-2, -@limits.coords.y4+@limits.coords.topTileLimit+2,1 )
+      vertex5 = new THREE.Vector3( @limits.coords.x1-@limits.coords.leftTileLimit-2, -@limits.coords.y1+@limits.coords.topTileLimit+2,1.0-(@maxdepth/1000) )
+      vertex6 = new THREE.Vector3( @limits.coords.x2-@limits.coords.leftTileLimit-2, -@limits.coords.y2+@limits.coords.topTileLimit+2,1.0-(@maxdepth/1000) )
+      vertex7 = new THREE.Vector3( @limits.coords.x3-@limits.coords.leftTileLimit-2, -@limits.coords.y3+@limits.coords.topTileLimit+2,1.0-(@maxdepth/1000) )
+      vertex8 = new THREE.Vector3( @limits.coords.x4-@limits.coords.leftTileLimit-2, -@limits.coords.y4+@limits.coords.topTileLimit+2,1.0-(@maxdepth/1000) )
       box = new THREE.Geometry()
       box.vertices.push( vertex1 )
       box.vertices.push( vertex2 )
@@ -117,7 +117,7 @@ class Plot
       @scene.add( line )
       controls.target.z = 1.0-(@maxdepth/2000)
 
-    document.getElementById("frame").src="frame.html?x1="+@util.getURLParameter('x1')+"&x2="+@util.getURLParameter('x2')+"&x3="+@util.getURLParameter('x3')+"&x4="+@util.getURLParameter('x4')+"&y1="+@util.getURLParameter('y1')+"&y2="+@util.getURLParameter('y2')+"&y3="+@util.getURLParameter('y3')+"&y4="+@util.getURLParameter('y4')+"&startdate="+@startdate+"&enddate="+@enddate+"&mag="+@mag
+    document.getElementById("frame").src="frame.html?x1="+@limits.latlng.x1+"&x2="+@limits.latlng.x2+"&x3="+@limits.latlng.x3+"&x4="+@limits.latlng.x4+"&y1="+@limits.latlng.y1+"&y2="+@limits.latlng.y2+"&y3="+@limits.latlng.y3+"&y4="+@limits.latlng.y4+"&startdate="+@startdate+"&enddate="+@enddate+"&mag="+@mag
 
   _processFeature: (feature)->
     @_checkMinMax(feature)
@@ -141,7 +141,7 @@ class Plot
     sphereGeometry = new THREE.SphereGeometry( radius, 8, 8 )
     sphereMaterial = new THREE.MeshPhongMaterial( { color: parseInt('0x'+@rainbow.colourAt(feature.geometry.coordinates[2])) , overdraw: false } )
     sphere = new THREE.Mesh( sphereGeometry, sphereMaterial )
-    sphere.position.set(@util.convertCoordinatesx(latVal)-@limits.leftTileLimit-2,-@util.convertCoordinatesy(lonVal)+@limits.topTileLimit+2,1.0-(depth/1000))
+    sphere.position.set(@util.convertCoordinatesx(latVal)-@limits.coords.leftTileLimit-2,-@util.convertCoordinatesy(lonVal)+@limits.coords.topTileLimit+2,1.0-(depth/1000))
     @sphereParent.add( sphere )
 
   _rect: (x,y) ->

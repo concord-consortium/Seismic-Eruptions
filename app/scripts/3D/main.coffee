@@ -41,13 +41,13 @@ class Main
 
     loader = new DataLoader()
     url = 'http://comcat.cr.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time-asc' +
-      '&starttime='+@util.getURLParameter("startdate")+'T00:00:00'+
-      '&endtime='+@util.getURLParameter("enddate")+'T23:59:59'+
-      '&minmagnitude='+@util.getURLParameter("mag")+
-      '&minlatitude='+Math.min(@util.getURLParameter("y1"),@util.getURLParameter("y2"),@util.getURLParameter("y3"),@util.getURLParameter("y4"))+
-      '&maxlatitude='+Math.max(@util.getURLParameter("y1"),@util.getURLParameter("y2"),@util.getURLParameter("y3"),@util.getURLParameter("y4"))+
-      '&minlongitude='+Math.min(@util.getURLParameter("x1"),@util.getURLParameter("x2"),@util.getURLParameter("x3"),@util.getURLParameter("x4"))+
-      '&maxlongitude='+Math.max(@util.getURLParameter("x1"),@util.getURLParameter("x2"),@util.getURLParameter("x3"),@util.getURLParameter("x4"))
+      '&starttime=' + @util.getURLParameter("startdate") + 'T00:00:00' +
+      '&endtime=' + @util.getURLParameter("enddate") + 'T23:59:59' +
+      '&minmagnitude=' + @util.getURLParameter("mag") +
+      '&minlatitude='  + Math.min(@limits.latlng.y1, @limits.latlng.y2, @limits.latlng.y3, @limits.latlng.y4) +
+      '&maxlatitude='  + Math.max(@limits.latlng.y1, @limits.latlng.y2, @limits.latlng.y3, @limits.latlng.y4) +
+      '&minlongitude=' + Math.min(@limits.latlng.x1, @limits.latlng.x2, @limits.latlng.x3, @limits.latlng.x4) +
+      '&maxlongitude=' + Math.max(@limits.latlng.x1, @limits.latlng.x2, @limits.latlng.x3, @limits.latlng.x4)
 
     loader.load(url).then (results) =>
       size = results.features.length
@@ -57,15 +57,15 @@ class Main
         }).bindPopup("Place: <b>"+feature.properties.place+"</b></br>Magnitude : <b>"+ feature.properties.mag+"</b></br>Time : "+@util.timeConverter(feature.properties.time)+"</br>Depth : "+feature.geometry.coordinates[2]+" km").addTo(map)
 
       L.polygon([
-            [parseFloat(@limits.y1),parseFloat(@limits.x1)],
-            [parseFloat(@limits.y2),parseFloat(@limits.x2)],
-            [parseFloat(@limits.y3),parseFloat(@limits.x3)],
-            [parseFloat(@limits.y4),parseFloat(@limits.x4)]
+            [parseFloat(@limits.latlng.y1),parseFloat(@limits.latlng.x1)],
+            [parseFloat(@limits.latlng.y2),parseFloat(@limits.latlng.x2)],
+            [parseFloat(@limits.latlng.y3),parseFloat(@limits.latlng.x3)],
+            [parseFloat(@limits.latlng.y4),parseFloat(@limits.latlng.x4)]
           ]).addTo(map)
-      map.fitBounds([[parseFloat(@limits.y1),parseFloat(@limits.x1)],
-            [parseFloat(@limits.y2),parseFloat(@limits.x2)],
-            [parseFloat(@limits.y3),parseFloat(@limits.x3)],
-            [parseFloat(@limits.y4),parseFloat(@limits.x4)]])
+      map.fitBounds([[parseFloat(@limits.latlng.y1),parseFloat(@limits.latlng.x1)],
+            [parseFloat(@limits.latlng.y2),parseFloat(@limits.latlng.x2)],
+            [parseFloat(@limits.latlng.y3),parseFloat(@limits.latlng.x3)],
+            [parseFloat(@limits.latlng.y4),parseFloat(@limits.latlng.x4)]])
       map.setZoom(map.getZoom()-1)
 
 module.exports = Main

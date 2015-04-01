@@ -16,7 +16,7 @@ class Scene
     @scene = new THREE.Scene()
     @camera = new THREE.PerspectiveCamera(25, canvasWidth / canvasHeight, 1, 100)
 
-    @camera.lookAt(new THREE.Vector3(@limits.midx-@limits.leftTileLimit-2,-@limits.midy+@limits.topTileLimit+2,1))
+    @camera.lookAt(new THREE.Vector3(@limits.coords.midx-@limits.coords.leftTileLimit-2,-@limits.coords.midy+@limits.coords.topTileLimit+2,1))
     @camera.position.set(0.1953529215215685,-5.647229198648456,1.4347925563786978)
     @camera.rotation.set(1.439025394333189,0.03591325303244356,0.004758846432708524)
 
@@ -31,8 +31,8 @@ class Scene
     document.getElementById("WebGLCanvas").appendChild( @stats.domElement )
 
     controls = new THREE.OrbitControls( @camera, @renderer.domElement )
-    controls.target.x = @limits.midx-@limits.leftTileLimit-2
-    controls.target.y = -@limits.midy+@limits.topTileLimit+2
+    controls.target.x = @limits.coords.midx-@limits.coords.leftTileLimit-2
+    controls.target.y = -@limits.coords.midy+@limits.coords.topTileLimit+2
     controls.target.z = 1
     controls.maxDistance = 8
 
@@ -56,7 +56,7 @@ class Scene
 
     for j in [0...4]
       for i in [0...4]
-        glassTexture = new THREE.ImageUtils.loadTexture(tileSource+(@limits.leftTileLimit+i)+"/"+(@limits.topTileLimit+j)+".png")
+        glassTexture = new THREE.ImageUtils.loadTexture(tileSource+(@limits.coords.leftTileLimit+i)+"/"+(@limits.coords.topTileLimit+j)+".png")
         glassTexture.wrapS = glassTexture.wrapT = THREE.RepeatWrapping
         glassTexture.repeat.set( 1, 1 )
         planeMaterial = new THREE.MeshBasicMaterial({

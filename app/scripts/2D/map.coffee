@@ -25,6 +25,9 @@ class Map
     center: if p = util.getURLParameter('center') then L.latLng(p.split(',')...) else null
     zoom: util.getURLParameter("zoom")
     timeline: util.getURLParameter('timeline')
+    data: util.getURLParameter('data')
+    datap: util.getURLParameter('datap')
+    datap_callback: util.getURLParameter('datap_callback')
 
   values:
     timediff: 0    # the total time between the first event and the last

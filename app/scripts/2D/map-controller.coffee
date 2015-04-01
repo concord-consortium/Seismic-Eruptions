@@ -156,7 +156,13 @@ class MapController
 
     if @map.parameters.timeline
       loader = new DataLoader()
-      loader.load('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time-asc&format=geojson' + @_geojsonURL()).then (results) =>
+      if @map.parameters.data?
+        promise = loader.load(@map.parameters.data, {ajax: true})
+      else if @map.parameters.datap? and @map.parameters.datap_callback?
+        promise = loader.load(@map.parameters.datap, {callback: @map.parameters.datap_callback})
+      else
+        promise = loader.load('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time-asc&format=geojson' + @_geojsonURL())
+      promise.then (results) =>
         @map.values.size = results.features.length
 
         for feature,i in results.features

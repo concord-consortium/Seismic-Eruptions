@@ -7,6 +7,7 @@ class Map
     d = new Date()
     @parameters.startdate = "1900/1/1" unless @parameters.startdate?
     @parameters.enddate = (d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate()) unless @parameters.enddate?
+    @parameters.timeline = @parameters.timeline? || false
 
   leafletMap: L.map('map', {worldCopyJump: true})
 
@@ -18,6 +19,7 @@ class Map
     enddate: util.getURLParameter("enddate")
     nw: if p = util.getURLParameter('nw') then L.latLng(p.split(',')...) else L.latLng(50, 40)
     se: if p = util.getURLParameter('se') then L.latLng(p.split(',')...) else L.latLng(-20, -40)
+    timeline: util.getURLParameter('timeline')
 
   values:
     timediff: 0    # the total time between the first event and the last

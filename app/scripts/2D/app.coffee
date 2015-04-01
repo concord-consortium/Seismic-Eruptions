@@ -21,6 +21,8 @@ class App
         @map.leafletMap.invalidateSize()
       , 1
 
+      @controller.timeLine.resume() if @map.parameters.timeline
+
   init: ->
     # buttons
     $('#play').click ->

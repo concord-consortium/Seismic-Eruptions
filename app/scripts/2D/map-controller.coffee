@@ -1,8 +1,20 @@
+DataLoader = require('common/data-loader')
+
 class MapController
   constructor: (@map)->
     @map.controller = @
     @util = require 'common/util'
+    @values = {}
     @initController()
+
+  values:
+    timediff: 0 # the total time between the first event and the last
+    size: 0 # number of earthquakes
+
+  earthquakes:
+    circles: [] # Array of earthquake markers
+    time: []    # time of occurrence of corresponding earthquakes
+    depth: []   # Array of depths of corresponding earthquakes
 
   # timeline of events
   timeLine: null
@@ -71,23 +83,32 @@ class MapController
     return 6
 
   _geojsonURL: (tileInfo) ->
-    tileSize = tileInfo.tileSize
-    tilePoint = L.point(tileInfo.x, tileInfo.y)
-    nwPoint = tilePoint.multiplyBy(tileSize)
-    sePoint = nwPoint.add(new L.Point(tileSize, tileSize))
-    nw = @map.leafletMap.unproject(nwPoint)
-    se = @map.leafletMap.unproject(sePoint)
-    zoom = tileInfo.z
+    if tileInfo?
+      tileSize = tileInfo.tileSize
+      tilePoint = L.point(tileInfo.x, tileInfo.y)
+      nwPoint = tilePoint.multiplyBy(tileSize)
+      sePoint = nwPoint.add(new L.Point(tileSize, tileSize))
+      nw = @map.leafletMap.unproject(nwPoint)
+      se = @map.leafletMap.unproject(sePoint)
+      zoom = tileInfo.z
+    else
+      if @map.parameters.nw
+        nw = @map.parameters.nw
+      if @map.parameters.se
+        se = @map.parameters.se
+      tileSize = 256
+      zoom = 0
 
     url = '&limit=' + @_getCurrentLimit(zoom, tileSize) +
              '&minmagnitude=' + @_getCurrentMag(zoom) +
-             '&minlatitude=' + se.lat +
+             '&starttime=' + @map.parameters.startdate +
+             '&endtime=' + @map.parameters.enddate
+    if nw? and se?
+      url += '&minlatitude=' + se.lat +
              '&maxlatitude=' + nw.lat +
              '&minlongitude=' + nw.lng +
-             '&maxlongitude=' + se.lng +
-             '&starttime=' + @map.parameters.startdate +
-             '&endtime=' + @map.parameters.enddate +
-             '&callback=' + tileInfo.requestId
+             '&maxlongitude=' + se.lng
+    url += '&callback=' + tileInfo.requestId if tileInfo?.requestId?
     return url
 
   _updateSlider: ->
@@ -99,9 +120,8 @@ class MapController
     @rainbow = new Rainbow()
     @rainbow.setNumberRange(0, 700)
 
-    @timeLine = new TimelineLite({
+    @timeLine = new TimelineLite
       onUpdate: => @_updateSlider()
-    })
 
     style = {
       "clickable": true
@@ -118,31 +138,6 @@ class MapController
       "fillOpacity": 0.3
     }
 
-    geojsonTileLayer = new L.TileLayer.GeoJSONP('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time&format=geojson{url_params}',
-      {
-        url_params: (tileInfo) => @_geojsonURL(tileInfo),
-        clipTiles: false,
-        wrapPoints: false
-      }, {
-        pointToLayer: (feature, latlng) ->
-          return L.circleMarker(latlng, style)
-        style: style
-        onEachFeature: (feature, layer) =>
-          depth = @_getDepth(feature)
-          layer.setStyle({
-            radius: feature.properties.mag,
-            fillColor: "#" + @rainbow.colourAt(depth)
-          })
-          if feature.properties?
-            layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + @util.timeConverter(feature.properties.time) + "</br>Depth : " + depth + " km")
-          if !(layer instanceof L.Point)
-            layer.on 'mouseover', ->
-              layer.setStyle(hoverStyle)
-            layer.on 'mouseout', ->
-              layer.setStyle(unhoverStyle)
-      }
-    )
-
     spinnerOpts = {
       lines: 13
       length: 10
@@ -154,12 +149,86 @@ class MapController
       shadow: true
     }
 
-    geojsonTileLayer.on 'loading', (event) =>
-      @map.leafletMap.spin(true, spinnerOpts)
+    if @map.parameters.timeline
+      loader = new DataLoader()
+      loader.load('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time&format=geojson' + @_geojsonURL()).then (results) =>
+        @map.values.size = results.features.length
 
-    geojsonTileLayer.on 'load', (event) =>
-      @map.leafletMap.spin(false)
+        for feature,i in results.features
+          @map.earthquakes.circles[i] = L.geoJson feature,
+            pointToLayer: (feature, latlng) ->
+              return L.circleMarker(latlng, style)
+            style: style
+            onEachFeature: (feature, layer) =>
+              depth = @_getDepth(feature)
+              layer.setStyle({
+                radius: feature.properties.mag,
+                fillColor: "#" + @rainbow.colourAt(depth)
+              })
+              if feature.properties?
+                layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + @util.timeConverter(feature.properties.time) + "</br>Depth : " + depth + " km")
+              if !(layer instanceof L.Point)
+                layer.on 'mouseover', ->
+                  layer.setStyle(hoverStyle)
+                layer.on 'mouseout', ->
+                  layer.setStyle(unhoverStyle)
 
-    geojsonTileLayer.addTo(@map.leafletMap)
+            @map.earthquakes.time[i] = feature.properties.time
+            @map.earthquakes.depth[i] = feature.geometry.coordinates[2]
+
+            # add events to timeline
+            delay = if i is 0 then 0 else 20 * ((feature.properties.time - results.features[i - 1].properties.time) / 1000000000)
+            @timeLine.append(TweenLite.delayedCall(delay, ((i)=> @map.mapAdder(i)), [i.toString()]))
+
+        @map.values.timediff = results.features[@map.values.size - 1].properties.time - results.features[0].properties.time
+        @map.parameters.starttime = results.features[0].properties.time
+
+        $("#slider").slider
+          value: 0
+          range: "min"
+          min: 0
+          max: @map.values.timediff
+          slide: (event, ui) =>
+            $("#date").html(@util.timeConverter(@map.parameters.starttime))
+            @timeLine.pause()
+            @timeLine.progress(ui.value / (@map.values.timediff))
+
+        $("#info").html("</br></br>total earthquakes : " + @map.values.size + "</br>minimum depth : " + @map.values.mindepth + " km</br>maximum depth : " + @map.values.maxdepth + " km</br></br></br><div class='ui-body ui-body-a'><p><a href='http://github.com/gizmoabhinav/Seismic-Eruptions'>Link to the project</a></p></div>")
+        $("#startdate").html("Start date : " + @util.timeConverter(@map.parameters.startdate))
+        $("#enddate").html("End date : " + @util.timeConverter(@map.parameters.enddate))
+        $("#magcutoff").html("Cutoff magnitude : " + @map.parameters.mag)
+    else
+      geojsonTileLayer = new L.TileLayer.GeoJSONP('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time&format=geojson{url_params}',
+        {
+          url_params: (tileInfo) => @_geojsonURL(tileInfo),
+          clipTiles: false,
+          wrapPoints: false
+        }, {
+          pointToLayer: (feature, latlng) ->
+            return L.circleMarker(latlng, style)
+          style: style
+          onEachFeature: (feature, layer) =>
+            depth = @_getDepth(feature)
+            layer.setStyle({
+              radius: feature.properties.mag,
+              fillColor: "#" + @rainbow.colourAt(depth)
+            })
+            if feature.properties?
+              layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + @util.timeConverter(feature.properties.time) + "</br>Depth : " + depth + " km")
+            if !(layer instanceof L.Point)
+              layer.on 'mouseover', ->
+                layer.setStyle(hoverStyle)
+              layer.on 'mouseout', ->
+                layer.setStyle(unhoverStyle)
+        }
+      )
+
+      geojsonTileLayer.on 'loading', (event) =>
+        @map.leafletMap.spin(true, spinnerOpts)
+
+      geojsonTileLayer.on 'load', (event) =>
+        @map.leafletMap.spin(false)
+
+      geojsonTileLayer.addTo(@map.leafletMap)
 
 module.exports = MapController

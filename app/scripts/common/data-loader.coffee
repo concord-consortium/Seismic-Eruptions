@@ -1,7 +1,4 @@
 class DataLoader
-  constructor: (@map)->
-    undefined
-
   load: (url)->
     return new Promise (resolve, reject) =>
       id = 'request_' + Math.random().toString(36).substr(2, 8) # a semi-random alphanumeric id

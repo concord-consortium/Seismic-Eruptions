@@ -197,7 +197,7 @@ class MapController
       # Clear the old points, request the new ones
       @timeLine.pause()
       for circle in @map.earthquakes.circles
-        @leafletMap.removeLayer(circle) if @leafletMap.hasLayer(circle)
+        @map.leafletMap.removeLayer(circle) if @map.leafletMap.hasLayer(circle)
       @map.earthquakes.circles = []
       @map.earthquakes.time = []
       @map.earthquakes.depth = []

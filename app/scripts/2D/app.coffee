@@ -9,13 +9,9 @@ class App
     $("#index").on "pageshow", (event, ui) =>
       $.mobile.loading('show')
       @map.leafletMap.invalidateSize(true)
-      @map.parameters.defaultInit()
       @map.layers.baseLayer2.addTo(@map.leafletMap)
 
-      @map.leafletMap.fitBounds([
-        [50, 40],
-        [-20, -40]
-      ])
+      @map.leafletMap.fitBounds L.latLngBounds(@map.parameters.nw, @map.parameters.se)
 
       @controller.timeLine.timeScale(@controller.speed)
       @controller.timeLine.pause()

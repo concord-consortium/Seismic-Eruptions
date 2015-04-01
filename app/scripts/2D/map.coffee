@@ -3,21 +3,21 @@ util = require 'common/util'
 
 # The map object with all the variables of current map being shown
 class Map
+  constructor: ->
+    d = new Date()
+    @parameters.startdate = "1900/1/1" unless @parameters.startdate?
+    @parameters.enddate = (d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate()) unless @parameters.enddate?
+
   leafletMap: L.map('map', {worldCopyJump: true})
 
   crossSection: {}
 
   parameters:
-    mag: util.getURLParameter("mag")
+    desiredMag: util.getURLParameter("mag")
     startdate: util.getURLParameter("startdate")
     enddate: util.getURLParameter("enddate")
-
-    defaultInit: ->
-      d = new Date()
-      @mag = 5 unless @mag?
-      @startdate = "1900/1/1" unless @startdate?
-      @enddate = (d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate()) unless @enddate?
-
+    nw: if p = util.getURLParameter('nw') then L.latLng(p.split(',')...) else L.latLng(50, 40)
+    se: if p = util.getURLParameter('se') then L.latLng(p.split(',')...) else L.latLng(-20, -40)
 
   values:
     timediff: 0    # the total time between the first event and the last

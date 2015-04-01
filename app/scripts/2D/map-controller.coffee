@@ -58,11 +58,12 @@ class MapController
     return Math.floor(15000/(width*height))
 
   _getCurrentMag: (zoom) ->
-    mag = @_getDesiredMag
-    @map.properties.mag = mag
+    mag = @_getDesiredMag(zoom)
+    @map.parameters.mag = mag
     return mag
 
   _getDesiredMag: (zoom) ->
+    return @map.parameters.desiredMag if @map.parameters.desiredMag?
     return 2 if (zoom > 8)
     return 3 if (zoom > 6)
     return 4 if (zoom > 3)

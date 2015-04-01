@@ -124,6 +124,14 @@ class App
       @map.parameters.enddate = @util.usgsDate(range.max)
       @map.parameters.desiredMag = $('#magnitude-slider').val()
       @controller.reloadData()
+      history.pushState {mapParams: @map.parameters}, 'Seismic Eruptions', @util.queryString(@map)
+
+    # FIXME This doesn't seem to end up working...
+    # $(window).on "navigate", (event, data) =>
+    #   if data.state?.mapParams?
+    #     console.log("One of our states came back!")
+    #     @map.parameters = data.state.mapParams
+    #     @controller.reloadData()
 
 
     ########### Drawing Controls ###########

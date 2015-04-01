@@ -30,11 +30,11 @@ class Scene
     @stats.domElement.style.top = '0px'
     document.getElementById("WebGLCanvas").appendChild( @stats.domElement )
 
-    controls = new THREE.OrbitControls( @camera, @renderer.domElement )
-    controls.target.x = @limits.coords.midx-@limits.coords.leftTileLimit-2
-    controls.target.y = -@limits.coords.midy+@limits.coords.topTileLimit+2
-    controls.target.z = 1
-    controls.maxDistance = 8
+    @controls = new THREE.OrbitControls( @camera, @renderer.domElement )
+    @controls.target.x = @limits.coords.midx-@limits.coords.leftTileLimit-2
+    @controls.target.y = -@limits.coords.midy+@limits.coords.topTileLimit+2
+    @controls.target.z = 1
+    @controls.maxDistance = 8
 
     starfieldgeometry  = new THREE.SphereGeometry(90, 32, 32)
     starmaterial  = new THREE.MeshBasicMaterial()

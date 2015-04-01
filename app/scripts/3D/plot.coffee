@@ -47,14 +47,14 @@ class Plot
           @count++
           @_processFeature(feature)
 
-      $("#info").html("</br></br>total earthquakes : "+size+"</br>minimum depth : "+mindepth+" km</br>maximum depth : "+maxdepth+" km</br></br></br><div class='ui-body ui-body-a'><p><a href='http://github.com/gizmoabhinav/Seismic-Eruptions'>Link to the project</a></p></div>")
-      $("#startdate").html("Start date : "+timeConverter(startdate))
-      $("#enddate").html("End date : "+timeConverter(enddate))
-      $("#magcutoff").html("Cutoff magnitude : "+minmag)
+      $("#info").html("</br></br>total earthquakes : "+size+"</br>minimum depth : "+@mindepth+" km</br>maximum depth : "+@maxdepth+" km</br></br></br><div class='ui-body ui-body-a'><p><a href='http://github.com/gizmoabhinav/Seismic-Eruptions'>Link to the project</a></p></div>")
+      $("#startdate").html("Start date : "+@util.timeConverter(@startdate))
+      $("#enddate").html("End date : "+@util.timeConverter(@enddate))
+      $("#magcutoff").html("Cutoff magnitude : "+@minmag)
 
 
       @sphereParent.position.set(0,0,0)
-      @scene.add(sphereParent)
+      @scene.scene.add(@sphereParent)
       # generate the box
       vertex1 = new THREE.Vector3( @limits.coords.x1-@limits.coords.leftTileLimit-2, -@limits.coords.y1+@limits.coords.topTileLimit+2,1 )
       vertex2 = new THREE.Vector3( @limits.coords.x2-@limits.coords.leftTileLimit-2, -@limits.coords.y2+@limits.coords.topTileLimit+2,1 )
@@ -114,8 +114,8 @@ class Plot
       lines.vertices.push( vertex4 )
       # lines
       line = new THREE.Line( lines, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1 } ) )
-      @scene.add( line )
-      controls.target.z = 1.0-(@maxdepth/2000)
+      @scene.scene.add( line )
+      @scene.controls.target.z = 1.0-(@maxdepth/2000)
 
     document.getElementById("frame").src="frame.html?x1="+@limits.latlng.x1+"&x2="+@limits.latlng.x2+"&x3="+@limits.latlng.x3+"&x4="+@limits.latlng.x4+"&y1="+@limits.latlng.y1+"&y2="+@limits.latlng.y2+"&y3="+@limits.latlng.y3+"&y4="+@limits.latlng.y4+"&startdate="+@startdate+"&enddate="+@enddate+"&mag="+@mag
 
@@ -145,18 +145,18 @@ class Plot
     @sphereParent.add( sphere )
 
   _rect: (x,y) ->
-    bax = x2 - x1
-    bay = y2 - y1
-    dax = x4 - x1
-    day = y4 - y1
+    bax = @limits.coords.x2 - @limits.coords.x1
+    bay = @limits.coords.y2 - @limits.coords.y1
+    dax = @limits.coords.x4 - @limits.coords.x1
+    day = @limits.coords.y4 - @limits.coords.y1
 
-    if ((x - x1) * bax + (y - y1) * bay < 0.0)
+    if ((x - @limits.coords.x1) * bax + (y - @limits.coords.y1) * bay < 0.0)
       return false
-    if ((x - x2) * bax + (y - y2) * bay > 0.0)
+    if ((x - @limits.coords.x2) * bax + (y - @limits.coords.y2) * bay > 0.0)
       return false
-    if ((x - x1) * dax + (y - y1) * day < 0.0)
+    if ((x - @limits.coords.x1) * dax + (y - @limits.coords.y1) * day < 0.0)
       return false
-    if ((x - x4) * dax + (y - y4) * day > 0.0)
+    if ((x - @limits.coords.x4) * dax + (y - @limits.coords.y4) * day > 0.0)
       return false
 
     return true

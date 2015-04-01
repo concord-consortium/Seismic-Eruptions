@@ -98,6 +98,16 @@ class App
     $('.ui-rangeSlider-rightLabel').click (evt) ->
       $('.ui-rangeSlider-rightLabel').datepicker('dialog', $('#daterange').dateRangeSlider('values').max, maxSelected, {}, evt)
 
+    updateShareLink = =>
+      range = $('#daterange').dateRangeSlider('values')
+      query = @util.queryString @map,
+        startdate: @util.usgsDate(range.min)
+        enddate: @util.usgsDate(range.max)
+        mag: $('#magnitude-slider').val()
+      url = window.location.origin + window.location.pathname + query
+      $('#share-link').attr "href", url
+      $('#share-link').text url
+
     elem = null
     $('#getQuakeCount').click =>
       $(this).addClass('ui-disabled')
@@ -111,6 +121,8 @@ class App
       elem.src = 'http://comcat.cr.usgs.gov/fdsnws/event/1/count?starttime=' + starttime + '&endtime=' + endtime + '&eventtype=earthquake&format=geojson' + @geojsonParams()
       elem.id = 'quake-count-script'
       document.body.appendChild(elem)
+
+      updateShareLink()
 
     window.updateQuakeCount = (result) ->
       $('#quake-count').html("Earthquakes: " + result.count)
@@ -126,6 +138,8 @@ class App
       @controller.reloadData()
       history.pushState {mapParams: @map.parameters}, 'Seismic Eruptions', @util.queryString(@map)
 
+      updateShareLink()
+
     # FIXME This doesn't seem to end up working...
     # $(window).on "navigate", (event, data) =>
     #   if data.state?.mapParams?
@@ -133,6 +147,10 @@ class App
     #     @map.parameters = data.state.mapParams
     #     @controller.reloadData()
 
+    $('#share-wrapper').hide()
+    $('#shareSelectedData').click ->
+      updateShareLink()
+      $('#share-wrapper').show()
 
     ########### Drawing Controls ###########
     if @map.parameters.timeline

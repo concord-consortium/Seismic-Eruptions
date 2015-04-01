@@ -46,12 +46,20 @@ class Util
   usgsDate: (date) ->
     return date.getFullYear() + '/' + (date.getMonth()+1) + '/' + date.getDate()
 
-  queryString: (map) ->
+  queryString: (map, overrides={}) ->
     center = map.leafletMap.getCenter()
-    out = "?zoom=#{map.leafletMap.getZoom()}" +
-          "&center=#{center.lat},#{center.lng}" +
-          "&mag=#{map.parameters.desiredMag}" +
-          "&startdate=#{map.parameters.startdate}" +
-          "&enddate=#{map.parameters.enddate}"
+    params =
+      zoom: map.leafletMap.getZoom()
+      center: "#{center.lat},#{center.lng}"
+      mag: map.parameters.desiredMag
+      startdate: map.parameters.startdate
+      enddate: map.parameters.enddate
+
+    params.timeline = true if map.parameters.timeline
+
+    for own key,value of overrides
+      params[key] = value
+
+    return '?' + $.param params
 
 module.exports = new Util()

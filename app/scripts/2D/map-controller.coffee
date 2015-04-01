@@ -247,7 +247,7 @@ class MapController
         @map.values.timediff = results.features[@map.values.size - 1].properties.time - results.features[0].properties.time
         @map.parameters.starttime = results.features[0].properties.time
 
-        $('#slider-wrapper').html "<input id='slider' name='slider' type='range' min='0' max='#{@map.values.timediff}' value='0' step='1' style='display: none;'>"
+        $('#slider-wrapper').html "<input id='slider' name='slider' type='range' min='0' max='#{@map.values.timediff}' value='0' step='1' style='display: none;' data-theme='a' data-track-theme='a'>"
         $("#slider").slider
           slidestart: (event) =>
             @timeLine.pause()

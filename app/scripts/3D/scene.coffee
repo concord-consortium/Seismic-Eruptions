@@ -37,8 +37,7 @@ class Scene
     @controls.maxDistance = 8
 
     starfieldgeometry  = new THREE.SphereGeometry(90, 32, 32)
-    starmaterial  = new THREE.MeshBasicMaterial()
-    starmaterial.map   = THREE.ImageUtils.loadTexture('../images/galaxy_starfield.png')
+    starmaterial  = new THREE.MeshBasicMaterial({color: 0x999999})
     starmaterial.side  = THREE.BackSide
     starmesh  = new THREE.Mesh(starfieldgeometry, starmaterial)
     @scene.add(starmesh)

@@ -58,10 +58,16 @@ class MapController
     return Math.floor(15000/(width*height))
 
   _getCurrentMag: (zoom) ->
+    mag = @_getDesiredMag
+    @map.properties.mag = mag
+    return mag
+
+  _getDesiredMag: (zoom) ->
     return 2 if (zoom > 8)
     return 3 if (zoom > 6)
     return 4 if (zoom > 3)
-    return 5
+    return 5 if (zoom > 1)
+    return 6
 
   _geojsonURL: (tileInfo) ->
     tileSize = tileInfo.tileSize
@@ -78,6 +84,8 @@ class MapController
              '&maxlatitude=' + nw.lat +
              '&minlongitude=' + nw.lng +
              '&maxlongitude=' + se.lng +
+             '&starttime=' + @map.parameters.startdate +
+             '&endtime=' + @map.parameters.enddate +
              '&callback=' + tileInfo.requestId
     return url
 
@@ -109,7 +117,7 @@ class MapController
       "fillOpacity": 0.3
     }
 
-    geojsonTileLayer = new L.TileLayer.GeoJSONP('http://comcat.cr.usgs.gov/fdsnws/event/1/query?starttime=1900/1/1%0000:00:00&eventtype=earthquake&orderby=time&format=geojson{url_params}',
+    geojsonTileLayer = new L.TileLayer.GeoJSONP('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time&format=geojson{url_params}',
       {
         url_params: (tileInfo) => @_geojsonURL(tileInfo),
         clipTiles: false,

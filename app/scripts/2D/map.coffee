@@ -8,14 +8,14 @@ class Map
   crossSection: {}
 
   parameters:
-    mag: util.getURLParameter("mag"),
-    startdate: util.getURLParameter("startdate"),
-    enddate: util.getURLParameter("enddate"),
+    mag: util.getURLParameter("mag")
+    startdate: util.getURLParameter("startdate")
+    enddate: util.getURLParameter("enddate")
 
     defaultInit: ->
       d = new Date()
       @mag = 5 unless @mag?
-      @startdate = "2009/1/1" unless @startdate?
+      @startdate = "1900/1/1" unless @startdate?
       @enddate = (d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate()) unless @enddate?
 
 

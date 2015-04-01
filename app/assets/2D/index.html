@@ -60,13 +60,21 @@
     <div data-role="page" id="index">
       <div data-theme="b" data-role="header">
         <h1>Seismic Eruptions</h1>
-        <a href="#options" data-rel='popup' data-transition="slidedown" class="ui-btn ui-icon-info ui-mini ui-btn-icon-notext ui-corner-all">Options</a>
+        <a href="#options-quake-count" data-rel='popup' data-transition="slidedown" class="ui-btn ui-icon-info ui-mini ui-btn-icon-notext ui-corner-all" id='options-button'>Options</a>
         <div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right">
           <a href="#" class="ui-btn ui-btn-b ui-icon-knife ui-mini ui-btn-icon-notext ui-corner-all" id="drawingTool" onclick="app.map.startdrawing()">Draw Cross-Section</a>
           <a href="#settings" class="ui-btn ui-icon-gear ui-mini ui-btn-icon-notext ui-corner-all">Settings</a>
         </div>
       </div>
-      <div data-role="popup" data-theme="b" class='ui-content' id="options">
+      <div data-role="panel" data-theme="b" data-display="overlay" id="options-details">
+        <div id="info" class="ui-bar ui-body-b"></div>
+        <div class="ui-bar ui-body-b">
+          <p id="startdate"></p>
+          <p id="enddate"></p>
+          <p id="magcutoff"></p>
+        </div>
+      </div>
+      <div data-role="popup" data-theme="b" class='ui-content' id="options-quake-count">
         <div class="ui-body ui-body-b" style="min-width: 400px; min-height: 300px; overflow: visible;">
           <div data-theme="b" data-role="header">
             Check Quake Count

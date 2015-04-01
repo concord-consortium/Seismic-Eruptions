@@ -55,6 +55,9 @@ class App
     $('#editparamsenter').click =>
       @controller.timeLine.pause()
 
+    if @map.parameters.timeline
+      $('#options-button').attr 'href', '#options-details'
+
     ########### Quake Count info controls #########
     $('#daterange').dateRangeSlider
       arrows: false

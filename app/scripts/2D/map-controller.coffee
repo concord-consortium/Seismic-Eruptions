@@ -255,7 +255,10 @@ class MapController
             $("#date").html(@util.timeConverter(@map.parameters.starttime))
             @timeLine.progress($("#slider").val() / (@map.values.timediff))
 
-        $("#info").html("</br></br>total earthquakes : " + @map.values.size + "</br>minimum depth : " + @map.values.mindepth + " km</br>maximum depth : " + @map.values.maxdepth + " km</br></br></br><div class='ui-body ui-body-a'><p><a href='http://github.com/gizmoabhinav/Seismic-Eruptions'>Link to the project</a></p></div>")
+        $("#info").html "<p>total earthquakes : " + @map.values.size +
+          "<br/>minimum depth : " + Math.min.apply(null, @map.earthquakes.depth) + " km" +
+          "</br>maximum depth : " + Math.max.apply(null, @map.earthquakes.depth) + " km</p>" +
+          "<div class='ui-body ui-body-a'><p><a href='http://github.com/gizmoabhinav/Seismic-Eruptions'>Link to the project</a></p></div>"
         $("#startdate").html("Start date : " + @util.timeConverter(@map.parameters.startdate))
         $("#enddate").html("End date : " + @util.timeConverter(@map.parameters.enddate))
         $("#magcutoff").html("Cutoff magnitude : " + @map.parameters.mag)

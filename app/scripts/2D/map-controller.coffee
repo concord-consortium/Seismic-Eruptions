@@ -5,7 +5,6 @@ class MapController
     @map.controller = @
     @util = require 'common/util'
     @values = {}
-    @initController()
 
   values:
     timediff: 0 # the total time between the first event and the last
@@ -40,7 +39,7 @@ class MapController
   _getCurrentLimit: (zoom, tileSize) ->
     numTiles = Math.pow(2, zoom)
     if zoom is 0
-      return 15000
+      return 20000
     else if zoom <= 3
       return Math.floor(20000 / Math.pow(numTiles,2))
 
@@ -92,10 +91,16 @@ class MapController
       se = @map.leafletMap.unproject(sePoint)
       zoom = tileInfo.z
     else
-      if @map.parameters.nw
+      bounds = @map.leafletMap.getBounds()
+      if @map.parameters.nw?
         nw = @map.parameters.nw
-      if @map.parameters.se
+      else if @map.parameters.center? and @map.parameters.zoom?
+        nw = bounds.getNorthWest()
+
+      if @map.parameters.se?
         se = @map.parameters.se
+      else if @map.parameters.center? and @map.parameters.zoom?
+        se = bounds.getSouthEast()
       tileSize = 256
       zoom = 0
 

@@ -8,6 +8,9 @@ class Map
     @parameters.startdate = "1900/1/1" unless @parameters.startdate?
     @parameters.enddate = (d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate()) unless @parameters.enddate?
     @parameters.timeline = @parameters.timeline? || false
+    unless @parameters.center? and @parameters.zoom
+      @parameters.nw ||= L.latLng(50, -40)
+      @parameters.se ||= L.latLng(-20, 40)
 
   leafletMap: L.map('map', {worldCopyJump: true})
 
@@ -17,8 +20,10 @@ class Map
     desiredMag: util.getURLParameter("mag")
     startdate: util.getURLParameter("startdate")
     enddate: util.getURLParameter("enddate")
-    nw: if p = util.getURLParameter('nw') then L.latLng(p.split(',')...) else L.latLng(50, 40)
-    se: if p = util.getURLParameter('se') then L.latLng(p.split(',')...) else L.latLng(-20, -40)
+    nw: if p = util.getURLParameter('nw') then L.latLng(p.split(',')...) else null
+    se: if p = util.getURLParameter('se') then L.latLng(p.split(',')...) else null
+    center: if p = util.getURLParameter('center') then L.latLng(p.split(',')...) else null
+    zoom: util.getURLParameter("zoom")
     timeline: util.getURLParameter('timeline')
 
   values:

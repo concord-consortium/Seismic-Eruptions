@@ -11,7 +11,12 @@ class App
       @map.leafletMap.invalidateSize(true)
       @map.layers.baseLayer2.addTo(@map.leafletMap)
 
-      @map.leafletMap.fitBounds L.latLngBounds(@map.parameters.nw, @map.parameters.se)
+      if @map.parameters.center? and @map.parameters.zoom?
+        @map.leafletMap.setView @map.parameters.center, @map.parameters.zoom
+      else
+        @map.leafletMap.fitBounds L.latLngBounds(@map.parameters.nw, @map.parameters.se)
+
+      @controller.initController()
 
       @controller.timeLine.timeScale(@controller.speed)
       @controller.timeLine.pause()

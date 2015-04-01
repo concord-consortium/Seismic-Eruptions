@@ -37,7 +37,15 @@ class CrossSection
     @_updateRect p0, p1
     @_createEditControls()
 
+    @current =
+      center: @map.getCenter()
+      zoom: @map.getZoom()
     @map.fitBounds(@_rect.getBounds()) if @_rect?
+
+  destroy: ->
+    @map.removeLayer(@_featureGroup)
+    @map.removeLayer(@_editMarkerGroup)
+    @map.setView @current.center, @current.zoom
 
   _updateLine: (p0, p1) ->
     @_line.setLatLngs([p0,p1])

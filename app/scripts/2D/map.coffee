@@ -11,7 +11,7 @@ class Map
 
   leafletMap: L.map('map', {worldCopyJump: true})
 
-  crossSection: {}
+  crossSection: null
 
   parameters:
     desiredMag: util.getURLParameter("mag")
@@ -41,8 +41,6 @@ class Map
 
   array: []
 
-  editing: false # state of the map
-
   plateBoundaries: new L.KML("plates.kml", { async: true })
 
   # toggle plate boundaries
@@ -59,7 +57,7 @@ class Map
 
     @earthquakes.circles[i].setStyle({
       fillOpacity: 0.5,
-      fillColor: "#" + rainbow.colourAt(@earthquakes.depth[i])
+      fillColor: "#" + @controller.rainbow.colourAt(@earthquakes.depth[i])
     })
     i++
     while @leafletMap.hasLayer(@earthquakes.circles[i])
@@ -76,8 +74,6 @@ class Map
 
   # render the cross section
   render: ->
-    if @editing
-      @editsave()
     # TODO Do we care?
     # if @crossSection.linelength is 0
     #   alert("Draw a cross-section first")
@@ -112,25 +108,14 @@ class Map
 
   # Start a new cross section drawing
   startdrawing: ->
-    if @editing
-      alert("Save edit before drawing a new cross-section")
+    if @crossSection?
+      alert("Click done on the current cross-section before drawing a new cross-section")
       return
     @crossSection = new CrossSection(@leafletMap)
 
-  # Edit the cross section drawing
-  editdrawing: ->
-    @editing = true
-    @crossSection.editAddHooks()
-
-  # save the edit
-  editsave: ->
-    @editing = false
-    @crossSection.editRemoveHooks()
-
   # go back to playback
   backtonormalview: ->
-    @editing = false
-    @crossSection.editRemoveHooks()
-    @crossSection.removeCrossSection()
+    @crossSection.destroy()
+    @crossSection = null
 
 module.exports = Map

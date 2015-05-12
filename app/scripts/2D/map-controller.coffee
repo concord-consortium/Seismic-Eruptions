@@ -122,6 +122,26 @@ class MapController
     $("#slider").val(Math.ceil(@timeLine.progress() * @map.values.timediff)).slider('refresh')
     $("#date").html(@util.timeConverter((@timeLine.progress() * @map.values.timediff) + @map.parameters.starttime))
 
+  _markerMaker: (style) ->
+    return {
+      pointToLayer: (feature, latlng) ->
+        return L.circleMarker(latlng, style)
+      style: style
+      onEachFeature: (feature, layer) =>
+        depth = @_getDepth(feature)
+        layer.setStyle({
+          radius: 0.9*Math.pow(1.5,(feature.properties.mag-1)),
+          fillColor: "#" + @rainbow.colourAt(depth)
+        })
+        if feature.properties?
+          layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + @util.timeConverter(feature.properties.time) + "</br>Depth : " + depth + " km")
+        if !(layer instanceof L.Point)
+          layer.on 'mouseover', ->
+            layer.setStyle(hoverStyle)
+          layer.on 'mouseout', ->
+            layer.setStyle(unhoverStyle)
+      }
+
   initController: ->
     #  colour gradient generator
     @rainbow = new Rainbow()
@@ -164,24 +184,7 @@ class MapController
           url_params: (tileInfo) => @_geojsonURL(tileInfo),
           clipTiles: false,
           wrapPoints: false
-        }, {
-          pointToLayer: (feature, latlng) ->
-            return L.circleMarker(latlng, style)
-          style: style
-          onEachFeature: (feature, layer) =>
-            depth = @_getDepth(feature)
-            layer.setStyle({
-              radius: feature.properties.mag,
-              fillColor: "#" + @rainbow.colourAt(depth)
-            })
-            if feature.properties?
-              layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + @util.timeConverter(feature.properties.time) + "</br>Depth : " + depth + " km")
-            if !(layer instanceof L.Point)
-              layer.on 'mouseover', ->
-                layer.setStyle(hoverStyle)
-              layer.on 'mouseout', ->
-                layer.setStyle(unhoverStyle)
-        }
+        }, @_markerMaker(style)
       )
 
       @geojsonTileLayer.on 'loading', (event) =>
@@ -218,30 +221,13 @@ class MapController
       @map.values.size = results.features.length
 
       for feature,i in results.features
-        @map.earthquakes.circles[i] = L.geoJson feature,
-          pointToLayer: (feature, latlng) ->
-            return L.circleMarker(latlng, style)
-          style: style
-          onEachFeature: (feature, layer) =>
-            depth = @_getDepth(feature)
-            layer.setStyle({
-              radius: feature.properties.mag,
-              fillColor: "#" + @rainbow.colourAt(depth)
-            })
-            if feature.properties?
-              layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + @util.timeConverter(feature.properties.time) + "</br>Depth : " + depth + " km")
-            if !(layer instanceof L.Point)
-              layer.on 'mouseover', ->
-                layer.setStyle(hoverStyle)
-              layer.on 'mouseout', ->
-                layer.setStyle(unhoverStyle)
+        @map.earthquakes.circles[i] = L.geoJson feature, @_markerMaker(style)
+        @map.earthquakes.time[i] = feature.properties.time
+        @map.earthquakes.depth[i] = feature.geometry.coordinates[2]
 
-          @map.earthquakes.time[i] = feature.properties.time
-          @map.earthquakes.depth[i] = feature.geometry.coordinates[2]
-
-          # add events to timeline
-          delay = if i is 0 then 0 else 20 * ((feature.properties.time - results.features[i - 1].properties.time) / 1000000000)
-          @timeLine.append(TweenLite.delayedCall(delay, ((i)=> @map.mapAdder(i)), [i.toString()]))
+        # add events to timeline
+        delay = if i is 0 then 0 else 20 * ((feature.properties.time - results.features[i - 1].properties.time) / 1000000000)
+        @timeLine.append(TweenLite.delayedCall(delay, ((i)=> @map.mapAdder(i)), [i.toString()]))
 
       if @map.values.size > 0
         @map.values.timediff = results.features[@map.values.size - 1].properties.time - results.features[0].properties.time

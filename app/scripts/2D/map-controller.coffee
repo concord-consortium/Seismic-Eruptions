@@ -179,7 +179,7 @@ class MapController
     if @map.parameters.timeline
       @_loadStaticData(style, hoverStyle, unhoverStyle, spinnerOpts)
     else
-      @geojsonTileLayer = new L.TileLayer.GeoJSONP('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time&format=geojson{url_params}',
+      @geojsonTileLayer = new L.TileLayer.GeoJSONP('http://earthquake.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time&format=geojson{url_params}',
         {
           url_params: (tileInfo) => @_geojsonURL(tileInfo),
           clipTiles: false,
@@ -216,7 +216,7 @@ class MapController
     else if @map.parameters.datap? and @map.parameters.datap_callback?
       promise = loader.load(@map.parameters.datap, {callback: @map.parameters.datap_callback})
     else
-      promise = loader.load('http://comcat.cr.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time-asc&format=geojson' + @_geojsonURL())
+      promise = loader.load('http://earthquake.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time-asc&format=geojson' + @_geojsonURL())
     promise.then (results) =>
       @map.values.size = results.features.length
 

@@ -27,7 +27,7 @@ class Plot
     @minmag = 999
 
     loader = new DataLoader()
-    url = 'http://comcat.cr.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time-asc' +
+    url = 'http://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time-asc' +
       '&minmagnitude='+@mag +
       '&starttime='+@startdate+'%2000:00:00' +
       '&endtime='+@enddate+'%2023:59:59' +

@@ -121,7 +121,7 @@ class App
       endtime = @util.usgsDate(range.max)
 
       elem = document.createElement('script')
-      elem.src = 'http://comcat.cr.usgs.gov/fdsnws/event/1/count?starttime=' + starttime + '&endtime=' + endtime + '&eventtype=earthquake&format=geojson' + @geojsonParams()
+      elem.src = 'http://earthquake.usgs.gov/fdsnws/event/1/count?starttime=' + starttime + '&endtime=' + endtime + '&eventtype=earthquake&format=geojson' + @geojsonParams()
       elem.id = 'quake-count-script'
       document.body.appendChild(elem)
 

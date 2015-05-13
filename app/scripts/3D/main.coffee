@@ -40,7 +40,7 @@ class Main
       })
 
     loader = new DataLoader()
-    url = 'http://comcat.cr.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time-asc' +
+    url = 'http://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time-asc' +
       '&starttime=' + @util.getURLParameter("startdate") + 'T00:00:00' +
       '&endtime=' + @util.getURLParameter("enddate") + 'T23:59:59' +
       '&minmagnitude=' + @util.getURLParameter("mag") +

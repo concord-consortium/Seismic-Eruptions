@@ -122,25 +122,33 @@ class MapController
     $("#slider").val(Math.ceil(@timeLine.progress() * @map.values.timediff)).slider('refresh')
     $("#date").html(@util.timeConverter((@timeLine.progress() * @map.values.timediff) + @map.parameters.starttime))
 
-  _markerMaker: (style) ->
-    return {
-      pointToLayer: (feature, latlng) ->
-        return L.circleMarker(latlng, style)
-      style: style
-      onEachFeature: (feature, layer) =>
-        depth = @_getDepth(feature)
-        layer.setStyle({
-          radius: 0.9*Math.pow(1.5,(feature.properties.mag-1)),
-          fillColor: "#" + @rainbow.colourAt(depth)
-        })
-        if feature.properties?
-          layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + @util.timeConverter(feature.properties.time) + "</br>Depth : " + depth + " km")
-        if !(layer instanceof L.Point)
-          layer.on 'mouseover', ->
-            layer.setStyle(hoverStyle)
-          layer.on 'mouseout', ->
-            layer.setStyle(unhoverStyle)
-      }
+  _markerStyle:
+    clickable: true
+    color: "#000"
+    fillColor: "#00D"
+    weight: 1
+    opacity: 1
+    fillOpacity: 0.3
+
+  _markerCreator: ->
+    pointToLayer: (feature, latlng) =>
+      return L.circleMarker(latlng, @_markerStyle)
+    style: @_markerStyle
+    onEachFeature: (feature, layer) =>
+      depth = @_getDepth(feature)
+      layer.setStyle({
+        radius: 0.9*Math.pow(1.5,(feature.properties.mag-1)),
+        fillColor: "#" + @rainbow.colourAt(depth)
+      })
+      if feature.properties?
+        layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + @util.timeConverter(feature.properties.time) + "</br>Depth : " + depth + " km")
+      if !(layer instanceof L.Point)
+        layer.on 'mouseover', ->
+          layer.setStyle
+            fillOpacity: 1.0
+        layer.on 'mouseout', ->
+          layer.setStyle
+            fillOpacity: 0.3
 
   initController: ->
     #  colour gradient generator
@@ -149,21 +157,6 @@ class MapController
 
     @timeLine = new TimelineLite
       onUpdate: => @_updateSlider()
-
-    style = {
-      "clickable": true
-      "color": "#000"
-      "fillColor": "#00D"
-      weight: 1
-      opacity: 1
-      fillOpacity: 0.3
-    }
-    hoverStyle = {
-      "fillOpacity": 1.0
-    }
-    unhoverStyle = {
-      "fillOpacity": 0.3
-    }
 
     spinnerOpts = {
       lines: 13
@@ -177,14 +170,14 @@ class MapController
     }
 
     if @map.parameters.timeline
-      @_loadStaticData(style, hoverStyle, unhoverStyle, spinnerOpts)
+      @_loadStaticData(spinnerOpts)
     else
       @geojsonTileLayer = new L.TileLayer.GeoJSONP('http://earthquake.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time&format=geojson{url_params}',
         {
           url_params: (tileInfo) => @_geojsonURL(tileInfo),
           clipTiles: false,
           wrapPoints: false
-        }, @_markerMaker(style)
+        }, @_markerCreator()
       )
 
       @geojsonTileLayer.on 'loading', (event) =>
@@ -208,7 +201,7 @@ class MapController
     else
       @geojsonTileLayer.redraw()
 
-  _loadStaticData: (style, hoverStyle, unhoverStyle, spinnerOpts) ->
+  _loadStaticData: (spinnerOpts) ->
     @timeLine.pause()
     loader = new DataLoader()
     if @map.parameters.data?
@@ -221,7 +214,7 @@ class MapController
       @map.values.size = results.features.length
 
       for feature,i in results.features
-        @map.earthquakes.circles[i] = L.geoJson feature, @_markerMaker(style)
+        @map.earthquakes.circles[i] = L.geoJson feature, @_markerCreator()
         @map.earthquakes.time[i] = feature.properties.time
         @map.earthquakes.depth[i] = feature.geometry.coordinates[2]
 

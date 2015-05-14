@@ -107,6 +107,7 @@ class MapController
       zoom = 0
 
     url = '&limit=' + @_getCurrentLimit(zoom, tileSize) +
+          '&jsonerror=true' +
              '&minmagnitude=' + @_getCurrentMag(zoom) +
              '&starttime=' + @map.parameters.startdate +
              '&endtime=' + @map.parameters.enddate
@@ -115,7 +116,7 @@ class MapController
              '&maxlatitude=' + nw.lat +
              '&minlongitude=' + nw.lng +
              '&maxlongitude=' + se.lng
-    url += '&callback=' + tileInfo.requestId if tileInfo?.requestId?
+
     return url
 
   _updateSlider: ->
@@ -172,7 +173,7 @@ class MapController
     if @map.parameters.timeline
       @_loadStaticData(spinnerOpts)
     else
-      @geojsonTileLayer = new L.TileLayer.GeoJSONP('http://earthquake.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time&format=geojson{url_params}',
+      @geojsonTileLayer = new L.TileLayer.GeoJSON('http://earthquake.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=magnitude&format=geojson{url_params}',
         {
           url_params: (tileInfo) => @_geojsonURL(tileInfo),
           clipTiles: false,
@@ -209,7 +210,7 @@ class MapController
     else if @map.parameters.datap? and @map.parameters.datap_callback?
       promise = loader.load(@map.parameters.datap, {callback: @map.parameters.datap_callback})
     else
-      promise = loader.load('http://earthquake.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time-asc&format=geojson' + @_geojsonURL())
+      promise = loader.load('http://earthquake.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time-asc&format=geojson' + @_geojsonURL(), {ajax: true})
     promise.then (results) =>
       @map.values.size = results.features.length
 

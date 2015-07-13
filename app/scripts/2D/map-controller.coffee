@@ -1,6 +1,7 @@
 DataLoader = require('common/data-loader')
 
 class MapController
+  @EARTHQUAKE_NUM_LIMIT: 500
   constructor: (@map)->
     @map.controller = @
     @util = require 'common/util'
@@ -37,11 +38,7 @@ class MapController
     return '???'
 
   _getCurrentLimit: (zoom, tileSize) ->
-    numTiles = Math.pow(2, zoom)
-    if zoom is 0
-      return 20000
-    else if zoom <= 3
-      return Math.floor(20000 / Math.pow(numTiles,2))
+    return MapController.EARTHQUAKE_NUM_LIMIT
 
     # Figure out how many tiles are actually displaying, and limit based on that
     bounds = @map.leafletMap.getBounds()
@@ -66,7 +63,7 @@ class MapController
     width = right - left
     height = bottom - top
 
-    return Math.floor(15000/(width*height))
+    return Math.floor(15000 / (width * height))
 
   _getCurrentMag: (zoom) ->
     mag = @_getDesiredMag(zoom)
@@ -106,22 +103,23 @@ class MapController
       tileSize = 256
       zoom = 0
 
-    url = '&limit=' + @_getCurrentLimit(zoom, tileSize) +
-          '&jsonerror=true' +
-             '&minmagnitude=' + @_getCurrentMag(zoom) +
-             '&starttime=' + @map.parameters.startdate +
-             '&endtime=' + @map.parameters.enddate
+    url = "&limit=#{@_getCurrentLimit(zoom, tileSize)}\
+           &jsonerror=true\
+           &minmagnitude=#{@_getCurrentMag(zoom)}\
+           &starttime=#{@map.parameters.startdate}\
+           &endtime=#{@map.parameters.enddate}"
     if nw? and se?
-      url += '&minlatitude=' + se.lat +
-             '&maxlatitude=' + nw.lat +
-             '&minlongitude=' + nw.lng +
-             '&maxlongitude=' + se.lng
+      url += "&minlatitude=#{se.lat}\
+              &maxlatitude=#{nw.lat}\
+              &minlongitude=#{nw.lng}\
+              &maxlongitude=#{se.lng}"
 
     return url
 
   _updateSlider: ->
     $("#slider").val(Math.ceil(@timeLine.progress() * @map.values.timediff)).slider('refresh')
-    $("#date").html(@util.timeConverter((@timeLine.progress() * @map.values.timediff) + @map.parameters.starttime))
+    $("#date").html(@util.timeConverter((@timeLine.progress() * @map.values.timediff) +
+      @map.parameters.starttime))
 
   _markerStyle:
     clickable: true
@@ -138,11 +136,15 @@ class MapController
     onEachFeature: (feature, layer) =>
       depth = @_getDepth(feature)
       layer.setStyle({
-        radius: 0.9*Math.pow(1.5,(feature.properties.mag-1)),
+        radius: 0.9 * Math.pow(1.5, (feature.properties.mag - 1)),
         fillColor: "#" + @rainbow.colourAt(depth)
       })
       if feature.properties?
-        layer.bindPopup("Place: <b>" + feature.properties.place + "</b></br>Magnitude : <b>" + feature.properties.mag + "</b></br>Time : " + @util.timeConverter(feature.properties.time) + "</br>Depth : " + depth + " km")
+        layer.bindPopup("\
+        Place: <b>#{feature.properties.place}</b></br>\
+        Magnitude: <b> #{feature.properties.mag}</b></br>\
+        Time: #{@util.timeConverter(feature.properties.time)}</br>\
+        Depth: #{depth} km")
       if !(layer instanceof L.Point)
         layer.on 'mouseover', ->
           layer.setStyle
@@ -173,14 +175,14 @@ class MapController
     if @map.parameters.timeline
       @_loadStaticData(spinnerOpts)
     else
-      @geojsonTileLayer = new L.TileLayer.GeoJSON('http://earthquake.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=magnitude&format=geojson{url_params}',
+      @geojsonTileLayer = new L.TileLayer.GeoJSON('http://earthquake.usgs.gov/fdsnws/event/1/query?\
+        eventtype=earthquake&orderby=magnitude&format=geojson{url_params}',
         {
           url_params: (tileInfo) => @_geojsonURL(tileInfo),
           clipTiles: false,
           wrapPoints: false
         }, @_markerCreator()
       )
-
       @geojsonTileLayer.on 'loading', (event) =>
         @map.leafletMap.spin(true, spinnerOpts)
 
@@ -210,24 +212,29 @@ class MapController
     else if @map.parameters.datap? and @map.parameters.datap_callback?
       promise = loader.load(@map.parameters.datap, {callback: @map.parameters.datap_callback})
     else
-      promise = loader.load('http://earthquake.usgs.gov/fdsnws/event/1/query?eventtype=earthquake&orderby=time-asc&format=geojson' + @_geojsonURL(), {ajax: true})
+      promise = loader.load("http://earthquake.usgs.gov/fdsnws/event/1/query?\
+        eventtype=earthquake&orderby=time-asc&format=geojson#{@_geojsonURL()}", {ajax: true})
     promise.then (results) =>
       @map.values.size = results.features.length
 
-      for feature,i in results.features
+      for feature, i in results.features
         @map.earthquakes.circles[i] = L.geoJson feature, @_markerCreator()
         @map.earthquakes.time[i] = feature.properties.time
         @map.earthquakes.depth[i] = feature.geometry.coordinates[2]
 
         # add events to timeline
-        delay = if i is 0 then 0 else 20 * ((feature.properties.time - results.features[i - 1].properties.time) / 1000000000)
+        delay = if i is 0 then 0 else
+          20 * ((feature.properties.time - results.features[i - 1].properties.time) / 1000000000)
         @timeLine.append(TweenLite.delayedCall(delay, ((i)=> @map.mapAdder(i)), [i.toString()]))
 
       if @map.values.size > 0
-        @map.values.timediff = results.features[@map.values.size - 1].properties.time - results.features[0].properties.time
+        @map.values.timediff = results.features[@map.values.size - 1].properties.time -
+          results.features[0].properties.time
         @map.parameters.starttime = results.features[0].properties.time
 
-        $('#slider-wrapper').html "<input id='slider' name='slider' type='range' min='0' max='#{@map.values.timediff}' value='0' step='1' style='display: none;' data-theme='a' data-track-theme='a'>"
+        $('#slider-wrapper').html "<input id='slider' name='slider' type='range' min='0'
+          max='#{@map.values.timediff}' value='0'step='1' style='display: none;'
+          data-theme='a' data-track-theme='a'>"
         $("#slider").slider
           slidestart: (event) =>
             @timeLine.pause()
@@ -235,13 +242,18 @@ class MapController
             $("#date").html(@util.timeConverter(@map.parameters.starttime))
             @timeLine.progress($("#slider").val() / (@map.values.timediff))
 
-        $("#info").html "<p>total earthquakes : " + @map.values.size +
-          "<br/>minimum depth : " + Math.min.apply(null, @map.earthquakes.depth) + " km" +
-          "</br>maximum depth : " + Math.max.apply(null, @map.earthquakes.depth) + " km</p>" +
-          "<div class='ui-body ui-body-a'><p><a href='http://github.com/gizmoabhinav/Seismic-Eruptions'>Link to the project</a></p></div>"
-        $("#startdate").html("Start date : " + @util.timeConverter(@map.parameters.startdate))
-        $("#enddate").html("End date : " + @util.timeConverter(@map.parameters.enddate))
-        $("#magcutoff").html("Cutoff magnitude : " + @map.parameters.mag)
+        $("#info").html """<p>
+          total earthquakes: #{@map.values.size}<br/>
+          minimum depth: #{Math.min.apply(null, @map.earthquakes.depth)} km</br>
+          maximum depth: #{Math.max.apply(null, @map.earthquakes.depth)} km
+          </p>
+          <div class='ui-body ui-body-a'><p>
+            <a href='http://github.com/gizmoabhinav/Seismic-Eruptions'>Link to the project</a>
+          </p></div>
+        """
+        $("#startdate").html("Start date: #{@util.timeConverter(@map.parameters.startdate)}")
+        $("#enddate").html("End date: #{@util.timeConverter(@map.parameters.enddate)}")
+        $("#magcutoff").html("Cutoff magnitude: #{@map.parameters.mag}")
 
         @timeLine.resume()
 

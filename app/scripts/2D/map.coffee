@@ -5,9 +5,10 @@ util = require 'common/util'
 class Map
   constructor: ->
     d = new Date()
-    @parameters.startdate = "1900/1/1" unless @parameters.startdate?
-    @parameters.enddate = (d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate()) unless @parameters.enddate?
-    @parameters.timeline = @parameters.timeline? || false
+    @parameters.startdate = "1960/1/1" unless @parameters.startdate?
+    @parameters.enddate = "#{d.getFullYear()}/#{d.getMonth() + 1}/#{d.getDate()}" unless\
+      @parameters.enddate?
+    @parameters.timeline = true
     unless @parameters.center? and @parameters.zoom
       @parameters.nw ||= L.latLng(50, -40)
       @parameters.se ||= L.latLng(-20, 40)
@@ -24,7 +25,6 @@ class Map
     se: if p = util.getURLParameter('se') then L.latLng(p.split(',')...) else null
     center: if p = util.getURLParameter('center') then L.latLng(p.split(',')...) else null
     zoom: util.getURLParameter("zoom")
-    timeline: util.getURLParameter('timeline')
     data: util.getURLParameter('data')
     datap: util.getURLParameter('datap')
     datap_callback: util.getURLParameter('datap_callback')
@@ -37,8 +37,10 @@ class Map
 
   layers:
     baseLayer3: L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {})
-    baseLayer2: L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {subdomains: ['otile1','otile2','otile3','otile4']})
-    baseLayer1: L.tileLayer('http://{s}.tiles.mapbox.com/v3/bclc-apec.map-rslgvy56/{z}/{x}/{y}.png', {})
+    baseLayer2: L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png',
+      {subdomains: ['otile1', 'otile2', 'otile3', 'otile4']})
+    baseLayer1: L.tileLayer('http://{s}.tiles.mapbox.com/v3/bclc-apec.map-rslgvy56/{z}/{x}/{y}.png',
+      {})
 
   drawnItems: new L.FeatureGroup() # features drawn on the map (constitute the cross-section)
 
@@ -49,7 +51,7 @@ class Map
 
   array: []
 
-  plateBoundaries: new L.KML("plates.kml", { async: true })
+  plateBoundaries: new L.KML("plates.kml", {async: true})
 
   # toggle plate boundaries
   plateToggle: ->
@@ -92,23 +94,26 @@ class Map
 
     pts = @crossSection.points
 
-    @render3DFrame("../3D/index.html?x1=" + pts[0].lng +
-      "&y1=" + pts[0].lat +
-      "&x2=" + pts[1].lng +
-      "&y2=" + pts[1].lat +
-      "&x3=" + pts[2].lng +
-      "&y3=" + pts[2].lat +
-      "&x4=" + pts[3].lng +
-      "&y4=" + pts[3].lat +
-      "&mag=" + @parameters.mag +
-      "&startdate=" + @parameters.startdate +
-      "&enddate=" + @parameters.enddate
+    @render3DFrame("../3D/index.html?\
+       x1=#{pts[0].lng}\
+      &y1=#{pts[0].lat}\
+      &x2=#{pts[1].lng}\
+      &y2=#{pts[1].lat}\
+      &x3=#{pts[2].lng}\
+      &y3=#{pts[2].lat}\
+      &x4=#{pts[3].lng}\
+      &y4=#{pts[3].lat}\
+      &mag=#{@parameters.mag}\
+      &startdate=#{@parameters.startdate}\
+      &enddate=#{@parameters.enddate}"
     ) if pts.length is 4
 
   render3DFrame: (url) ->
     frame = document.createElement("div")
     frame.className = 'crosssection-popup'
-    frame.innerHTML = "<div class='close-button'><span class='ui-btn-icon-notext ui-icon-delete'></span></div><div class='iframe-wrapper'><iframe class='crosssection-iframe' src='" + url + "'></iframe></div>"
+    frame.innerHTML = "<div class='close-button'><span class='ui-btn-icon-notext ui-icon-delete'>\
+      </span></div><div class='iframe-wrapper'><iframe class='crosssection-iframe' src='#{url}'>\
+      </iframe></div>"
     document.body.appendChild(frame)
 
     $('.close-button').click ->

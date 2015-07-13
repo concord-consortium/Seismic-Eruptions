@@ -62,7 +62,7 @@ class App
     $('#daterange').dateRangeSlider
       arrows: false
       bounds:
-        min: new Date(1900,0,1)
+        min: new Date(1900, 0, 1)
         max: Date.now()
       defaultValues:
         min: new Date(@map.parameters.startdate)
@@ -71,7 +71,7 @@ class App
         {
           next: (value) ->
             n = new Date(value)
-            return new Date(n.setYear(value.getFullYear()+20))
+            return new Date(n.setYear(value.getFullYear() + 20))
           label: (value) ->
             return value.getFullYear()
         }
@@ -80,7 +80,7 @@ class App
     $('#magnitude-slider').val(@map.parameters.desiredMag || @map.parameters.mag).slider('refresh')
 
     $.datepicker.setDefaults
-      minDate: new Date(1900,0,1)
+      minDate: new Date(1900, 0, 1)
       maxDate: 0
       changeMonth: true
       changeYear: true
@@ -96,10 +96,12 @@ class App
       $('#daterange').dateRangeSlider('values', prevVals.min, newDate)
 
     $('.ui-rangeSlider-leftLabel').click (evt) ->
-      $('.ui-rangeSlider-leftLabel').datepicker('dialog', $('#daterange').dateRangeSlider('values').min, minSelected, {}, evt)
+      $('.ui-rangeSlider-leftLabel').datepicker('dialog',
+        $('#daterange').dateRangeSlider('values').min, minSelected, {}, evt)
 
     $('.ui-rangeSlider-rightLabel').click (evt) ->
-      $('.ui-rangeSlider-rightLabel').datepicker('dialog', $('#daterange').dateRangeSlider('values').max, maxSelected, {}, evt)
+      $('.ui-rangeSlider-rightLabel').datepicker('dialog',
+              $('#daterange').dateRangeSlider('values').max, maxSelected, {}, evt)
 
     updateShareLink = =>
       range = $('#daterange').dateRangeSlider('values')
@@ -121,7 +123,8 @@ class App
       endtime = @util.usgsDate(range.max)
 
       elem = document.createElement('script')
-      elem.src = 'http://earthquake.usgs.gov/fdsnws/event/1/count?starttime=' + starttime + '&endtime=' + endtime + '&eventtype=earthquake&format=geojson' + @geojsonParams()
+      elem.src = "http://earthquake.usgs.gov/fdsnws/event/1/count?starttime=#{starttime}\
+        &endtime=#{endtime}&eventtype=earthquake&format=geojson#{@geojsonParams()}"
       elem.id = 'quake-count-script'
       document.body.appendChild(elem)
 
@@ -307,12 +310,12 @@ class App
       nw.lng = -180
       se.lng = 180
 
-    url = '&minmagnitude=' + mag +
-          '&minlatitude=' + se.lat +
-          '&maxlatitude=' + nw.lat +
-          '&minlongitude=' + nw.lng +
-          '&maxlongitude=' + se.lng +
-          '&callback=updateQuakeCount'
+    url = "&minmagnitude=#{mag}\
+          &minlatitude=#{se.lat}\
+          &maxlatitude=#{nw.lat}\
+          &minlongitude=#{nw.lng}\
+          &maxlongitude=#{se.lng}\
+          &callback=updateQuakeCount"
     return url
 
 module.exports = App

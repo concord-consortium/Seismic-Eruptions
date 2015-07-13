@@ -1,6 +1,6 @@
 class MagnitudeSearch
   loadMagArray: ->
-    return new Promise (resolve,reject)=>
+    return new Promise (resolve, reject)=>
       $.get 'count.txt', (data) =>
         arr = data.split(',')
         @magarray = []
@@ -43,32 +43,32 @@ class MagnitudeSearch
     @d2.year = @d2.year - 60
     @d1.month = @d2.month - 1
 
-    if @d2.year*12 + @d2.month <= @d1.year*12 + @d1.month
+    if @d2.year * 12 + @d2.month <= @d1.year * 12 + @d1.month
       $("#error-date").html("<p style='color:red'>Select a valid date range</p>")
       return
 
     if click is 0
-      window.open("?mag="+@_binarySearch(0,100) +
-        "&startdate=" + (@d1.year+1960) + "-" + (@d1.month+1) + "-1" +
-        "&enddate="   + (@d2.year+1960) + "-" + (@d2.month+1) + "-1",
+      window.open("?mag=#{@_binarySearch(0, 100)}&startdate=#{(@d1.year+1960)}-#{(@d1.month+1)}-1&\
+        enddate=#{(@d2.year+1960)}-#{(@d2.month+1)}-1",
         "_self"
       )
     else
-      $("#magnitude-search").html("<p>Calculated magnitude cutoff : </p><p style='color:green'>"+@_binarySearch(0,100)+"</p>")
+      $("#magnitude-search").html("<p>Calculated magnitude cutoff : </p><p style='color:green'>\
+        #{@_binarySearch(0, 100)}</p>")
 
-  _binarySearch: (mag,max) ->
+  _binarySearch: (mag, max) ->
     if  mag < max
       count = 0
-      count = @magArray[mag][d2.year*12+d2.month]-@magArray[mag][d1.year*12+d1.month]
+      count = @magArray[mag][d2.year * 12 + d2.month] - @magArray[mag][d1.year * 12 + d1.month]
       if count > 20000
-        nextMag = mag + (max-mag)/2
-        return binarySearch(nextMag,max)
+        nextMag = mag + (max - mag) / 2
+        return binarySearch(nextMag, max)
       else if count < 15000 and mag isnt 0
-        nextMag = mag - (max-mag)/2
-        return binarySearch(nextMag,mag)
+        nextMag = mag - (max - mag) / 2
+        return binarySearch(nextMag, mag)
       else
-        return mag/10
+        return mag / 10
     else
-      return max/10
+      return max / 10
 
 module.exports = new MagnitudeSearch()

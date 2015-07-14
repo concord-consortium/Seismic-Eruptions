@@ -20,7 +20,7 @@ class MapController
   timeLine: null
 
   # speed of events
-  speed: 6
+  speed: 360
 
   # sound of the audio
   snd: new Audio("tap.wav") # buffers automatically when created
@@ -232,9 +232,7 @@ class MapController
           results.features[0].properties.time
         @map.parameters.starttime = results.features[0].properties.time
 
-        $('#slider-wrapper').html "<input id='slider' name='slider' type='range' min='0'
-          max='#{@map.values.timediff}' value='0'step='1' style='display: none;'
-          data-theme='a' data-track-theme='a'>"
+        
         $("#slider").slider
           slidestart: (event) =>
             @timeLine.pause()

@@ -6,47 +6,49 @@ objects, as if each were a node in a larger network
 module.exports =
 class NNode
   constructor: ()->
-    @channels = {}
-    @neighbors = []
+    @listenerMap = {}
+    @subscriberListenerMap = {}
   ###
-  Triggers listeners on all connected nodes
+  News onhand! Tell this to all eager subscribers.
   ###
-  tellOthers: (channel, data...)->
-    @tell(channel, data...)
-    for subscriber in @neighbors
-      subscriber.tell(channel, data...)
-    return this
+  post: (channel, data...)->
+    # console.log("post", channel, data...)
+    @_activateListeners(@subscriberListenerMap, channel, data)
 
   ###
-  Triggers the listeners on the current node with the given data
+  Subscribe to a popular node to keep updated.
+  All news will be prepended with the namespace, if given
+  ###
+  subscribe: (channel, listener)->
+    @_addToListenerMap(@subscriberListenerMap, channel, listener)
+    return
+
+  ###
+  Tells this node a very personal message.
   ###
   tell: (channel, data...)->
-    if @channels[channel]?
-      for listener in @channels[channel]
-        listener.apply(this, data)
-    # console.log("told", this, channel, data)
-    return this
+    @_activateListeners(@listenerMap, channel, data)
+    return
 
   ###
-  Creates a uni-directional connection pathway to the given node
-  ###
-  connectTo: (node)->
-    @neighbors.push(node) if @neighbors.indexOf(node) is -1
-    return this
-
-  ###
-  Creates a bi-directional connection pathway between the current and given nodes
-  ###
-  connect: (node)->
-    @connectTo(node)
-    node.connectTo(this)
-    return this
-
-  ###
-  Registers a listener on the current node
+  Registers this node to hear any type of message.
   ###
   listen: (channel, listener)->
-    @channels[channel] = [] unless @channels[channel]?
-    if @channels[channel].indexOf(listener) is -1
-      @channels[channel].push(listener)
-    return this
+    @_addToListenerMap(@listenerMap, channel, listener)
+    return
+
+  _addToListenerMap: (map, channel, listener)->
+    map[channel] = [] unless map[channel]?
+    @_addToSet(map[channel], listener)
+    return
+
+  _activateListeners: (map, channel, data)->
+    if map[channel]?
+      for listener in map[channel]
+        listener.apply(this, data)
+    return
+
+  _addToSet: (array, value)->
+    if array.indexOf(value) is -1
+      array.push(value)
+    return

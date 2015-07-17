@@ -3,7 +3,7 @@
   <head>
     <title>Seismic Eruptions</title>
     <meta http-equiv='Content-Type' content='text/html, charset=utf-8'/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densityDpi=device-dpi"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
 
     <link rel="stylesheet" type='text/css' href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
     <link rel="stylesheet" type='text/css' href="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
@@ -14,6 +14,7 @@
     <link rel="stylesheet" type='text/css' href="vendor-2d.css" />
     <link rel="stylesheet" type='text/css' href="app-2d.css" />
     <style type='text/css'>
+      /* Full screen the UI content area and map */
       .ui-content {
         position: absolute;
         top: 0;
@@ -36,6 +37,7 @@
         background-image: url("../images/knife-dashed-line.png");
         background-size: 18px 18px;
       }*/
+      /* Positions the controls properly */
       #controls {
         text-align: center;
         padding: 0;
@@ -44,6 +46,7 @@
         right: 0;
         bottom: 0;
       }
+      /* Give more room to the slider and less to the buttons on both sides */
       #controls > .ui-block-a{
         width: 25%;
       }
@@ -53,11 +56,33 @@
       #controls > .ui-block-c{
         width: 25%;
       }
-      .ui-slider-track{
-        margin: 0 35px;
+      /* Make the slider look consistent with the buttons */
+      .ui-slider-track, #display-options-menu .ui-rangeslider-sliders{
+        margin-left: 35px;
+        margin-right: 35px;
       }
-      #slider-wrapper{
+      #slider-wrapper .ui-slider-track {
+        margin-left: 55px;
+        margin-right: 55px;
+      }
+      #slider-wrapper {
         margin: 0.5em 0;
+      }
+      /*Hack the slider handle to make a date fit in it*/
+      #slider-wrapper .ui-slider-handle{
+        width: 95px;
+        margin-left: -55px;
+        text-align: right;
+        padding-right: 10px;
+      }
+      /* Adjust positioning for the display options */
+      #display-options-menu{
+        position: absolute;
+        /* This is somewhat a hack, figure out if can be removed */
+        left: -350px;
+        top: -380px;
+        width: 400px;
+        height: 330px;
       }
     </style>
 
@@ -81,24 +106,38 @@
   </head>
   <body>
     <div data-role="page" id="index">
-      <div data-role="panel" data-theme="b" data-display="overlay" id="options-details">
-        <div id="info" class="ui-bar ui-body-b"></div>
-        <div class="ui-bar ui-body-b">
-          <p id="startdate"></p>
-          <p id="enddate"></p>
-          <p id="magcutoff"></p>
-        </div>
-      </div>
-      <div data-role="popup" data-theme="b" class='ui-content' id="options-quake-count">
-        <div class="ui-body ui-body-b" style="min-width: 400px; min-height: 300px; overflow: visible;">
-          <div data-theme="b" data-role="header">
-            Check Quake Count
-          </div>
-          <div class="ui-bar ui-bar-a" id="quake-count">Earthquakes: ???</div>
-          <div style="padding:10px 20px;" data-theme="b">
+      <div data-role="popup" data-theme="b" class='ui-content' id="display-options-menu" style="overflow: visible;">
+        <div class="ui-body">
+          <p>
+            <div data-role="rangeslider">
+              <label for="date-slider-start">Restrict to earthquakes between <b id="date-slider-readout">_</b></label>
+              <!-- Min, max, step, and value to be set by code -->
+              <input name="date-slider-start" id="date-slider-start" min="0" max="0" value="0" step="0" type="range" style="display:none;"/>
+              <input name="date-slider-end" id="date-slider-end" min="0" max="0" value="0" step="0" type="range" style="display:none;"/>
+            </div>
+          </p>
+          <p>
+            <label for='magnitude-slider'>Only show earthquakes <b id="magnitude-readout">_</b> or stronger</label>
+            <!-- Min, max, step, and value to be set by code -->
+            <input id="magnitude-slider" name="magnitude-slider" type="range" range="max" min="0" max="0" value="0" step="0" data-highlight="true" style="display:none;">
+          </p>
+          <p>
+            <label for="plate-toggle">Show Plate Boundaries</label>
+            <input data-role="flipswitch" data-mini="true" type="checkbox" name="plate-toggle" id="plate-toggle">
+          </p>
+          <p>
+            <label for="map-selector">Displayed Map Type</label>
+            <select name="map-selector" id="map-selector" data-native-menu="false" data-mini="true">
+              <option value="earthquake-density">Earthquake Density Map (PRCC)</option>
+              <option value="satillite" selected>Satellite Map</option>
+              <option value="street">Street Map (OSM)</option>
+            </select>
+          </p>
+          <!-- Sorry, daterange. Maybe another day.
             <div id="daterange"></div>
             <div id="daterange-picker-left" style="float: left; display: none;"></div>
             <div id="daterange-picker-right" style="float: left; display: none;"></div>
+            <div id="share-wrapper" data-mini="true">
             <div style="padding-top: 10px;">
               <label for='magnitude-slider'>Magnitude cutoff:</label>
               <input id="magnitude-slider" name="magnitude-slider" type="range" min="1" max="9" value="5" step="0.1" >
@@ -112,10 +151,10 @@
               Give this link to share:<br/>
               <a id="share-link" href='#' target='_blank' style='word-break: break-word; -webkit-hyphens: auto; -moz-hyphens: auto; hyphens: auto;'></a>
             </h6>
-          </div>
+          </div>-->
         </div>
       </div>
-       <div data-role="panel" data-position="right" data-display="overlay" data-theme="b" id="settings">
+       <!-- <div data-role="panel" data-position="right" data-displa="overlay" data-theme="b" id="settings">
         <form>
           <div class="ui-field-contain">
             <label for="plates">Plate-boundaries</label>
@@ -129,23 +168,26 @@
             </select>
           </div>
         </form>
-      </div>
+      </div> -->
 
       <div data-role="content" data-theme="b">
         <div id="map"></div>
         <div class="ui-bar ui-body-b ui-grid-b" id="controls">
           <div class="ui-grid-b ui-block-a" id="playcontrols">
-            <div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-backward ui-corner-all" id="slowdown" tabindex="1" title="Slower (S)"></a></div>
-            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-play ui-corner-all" id="playpause" tabindex="2" title="Play/Pause (P)"></a></div>
-            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-forward ui-corner-all" id="speedup" tabindex="3" title="Faster (F)"></a></div>
+            <div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-backward ui-corner-all" id="slowdown" tabindex="1" accesskey="l" href="" title="Slower (S)"></a></div>
+            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-play ui-corner-all" id="playpause" tabindex="2" accesskey="p" href="" title="Play/Pause (P)"></a></div>
+            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-forward ui-corner-all" id="speedup" tabindex="3" accesskey="s" href="" title="Faster (F)"></a></div>
           </div>
-          <div class="ui-block-b" id="slider-wrapper">
-
+          <div class="ui-block-b" id="slider-wrapper" data-enhance="false" data-role="none">
+            <!-- Step and value to be set by code -->
+            <input id="slider" name="slider" type="range" min="0"
+              max="1" value="0" step="0" style="display:none;"
+              data-theme="b" data-track-theme="b" tabindex="4" data-highlight="true">
           </div>
           <div class="ui-block-c ui-grid-b">
-            <div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-gear ui-corner-all" id="settings" tabindex="4" title="Display Options (O)"></a></div>
-            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-star ui-corner-all" id="mapkey" tabindex="5" title="Map Key (K)"></a></div>
-            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-info ui-corner-all" id="info" tabindex="6" title="About and Credits (I)"></a></div>
+            <div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-gear ui-corner-all" id="display-options" tabindex="5" accesskey="o" title="Display Options (O)" data-rel="popup" href="#display-options-menu"></a></div>
+            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-star ui-corner-all" id="mapkey" tabindex="6" accesskey="k" href="" title="Map Key (K)"></a></div>
+            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-info ui-corner-all" id="info" tabindex="7" accesskey="i" href="" title="About and Credits (I)"></a></div>
           </div>
         </div>
       </div>

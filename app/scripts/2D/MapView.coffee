@@ -12,11 +12,7 @@ class MapView extends NNode
 
     # TODO: Move this into LocationManager
     @leafletMap.fitBounds(L.latLngBounds(L.latLng(-50, -40), L.latLng(50, 40)))
-
-    # TODO: Move this into BaseMapManager
-    @leafletMap.addLayer L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png',
-      {subdomains: ['otile1', 'otile2', 'otile3', 'otile4']})
-
+    
     @leafletMap.invalidateSize(true)
 
     @listen "add-layer", (layer)=>

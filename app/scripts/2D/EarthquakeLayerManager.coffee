@@ -7,6 +7,8 @@ TODO: HORRIBLY INCOMPLETE
 NNode = require("./NNode")
 DateFilter = require("./DateFilter")
 MapView = require("./MapView")
+Utils = require("./Utils")
+
 module.exports = new
 class EarthquakeLayerManager extends NNode
   constructor: ()->
@@ -67,18 +69,36 @@ class EarthquakeLayerManager extends NNode
     rainbow = new Rainbow()
     rainbow.setNumberRange(0, 700)
 
-    # Here's where the styling occurs
+    # Here's where some formatting magic occurs
     @earthquakesLayer = L.geoJson [], {
       pointToLayer: (feature, latlng) ->
+        # Style the point properly
         depth = feature.geometry.coordinates[2]
         magnitude = feature.properties.mag
         style = {
-          fillOpacity: 0.6
+          clickable: true
+          # Stroke
+          weight: 1.5
+          opacity: 0.2
+          color: "#000"
+          # Fill
+          fillOpacity: 0.5
           fillColor: "#" + rainbow.colourAt(depth)
           radius: 0.9 * Math.pow(1.5, (magnitude - 1))
-          stroke: no
         }
-        return L.circleMarker(latlng, style)
+
+        # Create a marker with the given style
+        marker = L.circleMarker(latlng, style)
+
+        # Add a popup to it
+        marker.bindPopup("""
+        Place: <b>#{feature.properties.place}</b></br>
+        Magnitude: <b>#{magnitude.toFixed(1)}</b></br>
+        Date: <b>#{Utils.formatDate(new Date(feature.properties.time))}</b></br>
+        Depth: <b>#{depth} km</b>
+        """)
+
+        return marker
     }
 
     @mapView.tell "add-layer", @earthquakesLayer

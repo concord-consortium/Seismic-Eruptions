@@ -72,7 +72,7 @@ class DateFilterController extends NNode
   updatePlaybackSliderTextOnly: ()->
     # Set the playhead text
     @playbackController.tell "set-text",
-      "#{Utils.dateFormat(@animatedEndDate)}"
+      "#{Utils.formatDate(@animatedEndDate)}"
 
   updatePlaybackSlider: ()->
     # Set the playhead depending on new start and end ranges

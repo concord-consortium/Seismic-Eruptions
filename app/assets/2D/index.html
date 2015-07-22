@@ -108,7 +108,7 @@
             </div>
           </p>
           <p>
-            <label for='magnitude-slider'>Only show earthquakes <b id="magnitude-readout">_</b> or stronger</label>
+            <label for='magnitude-slider'>Only show earthquakes magnitude <b id="magnitude-readout">_</b> or stronger</label>
             <!-- Min, max, step, and value to be set by code -->
             <input id="magnitude-slider" name="magnitude-slider" type="range" range="max" min="0" max="0" value="0" step="0" data-highlight="true" style="display:none;">
           </p>
@@ -117,10 +117,10 @@
             <input data-role="flipswitch" data-mini="true" type="checkbox" name="plate-toggle" id="plate-toggle">
           </p>
           <p>
-            <label for="map-selector">Displayed Map Type</label>
-            <select name="map-selector" id="map-selector" data-native-menu="false" data-mini="true">
-              <option value="earthquake-density">Earthquake Density Map (PRCC)</option>
-              <option value="satillite" selected>Satellite Map</option>
+            <label for="base-map-selector">Displayed Map Type</label>
+            <select name="base-map-selector" id="base-map-selector" data-native-menu="false" data-mini="true">
+              <option value="density">Earthquake Density Map (PRCC)</option>
+              <option value="satellite" selected>Satellite Map</option>
               <option value="street">Street Map (OSM)</option>
             </select>
           </p>

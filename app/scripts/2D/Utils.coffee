@@ -10,7 +10,7 @@ class Utils
     (value - min) / (max - min)
 
   # Formats a given date number as MMM DD, YYYY
-  @dateFormat: (dateNumber)->
+  @formatDate: (dateNumber)->
     date = new Date(dateNumber)
     return "#{Utils.getMonth(date.getMonth())} #{date.getDate()}, #{date.getFullYear()}"
 

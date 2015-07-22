@@ -5,7 +5,7 @@ A small class to manage the playback buttons
 NNode = require("./NNode")
 
 
-module.exports =
+module.exports = new
 class PlaybackButtonsUI extends NNode
 
   constructor: ()->

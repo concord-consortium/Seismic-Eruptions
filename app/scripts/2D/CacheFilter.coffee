@@ -7,7 +7,7 @@ TODO: FIXME: HACK: NOTE: THIS CLASS IS HALF-BAKED at the moment
 
 NNode = require("./NNode")
 
-module.exports =
+module.exports = new
 class CacheFilter extends NNode
   constructor: ()->
     super

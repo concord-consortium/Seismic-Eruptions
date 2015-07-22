@@ -7,7 +7,7 @@ PlaybackController = require("./PlaybackController")
 DateRangeSliderUI = require("./DateRangeSliderUI")
 Utils = require("./Utils")
 
-module.exports =
+module.exports = new
 class DateFilterController extends NNode
 
   @MIN_DATE: (new Date(1900, 0)).valueOf()
@@ -20,7 +20,7 @@ class DateFilterController extends NNode
     @animatedEndDate = DateFilterController.MAX_DATE
 
     # Create and hook up a playback controller
-    @playbackController = new PlaybackController()
+    @playbackController = PlaybackController
 
     @playbackController.subscribe "update", (progress)=>
       @animatedEndDate = Utils.expandNorm(progress, @startDate, @endDate)
@@ -28,13 +28,14 @@ class DateFilterController extends NNode
       @updatePlaybackSliderTextOnly()
 
     # Create and hook up a the UI date range
-    @dateRangeSlider = new DateRangeSliderUI({
+    @dateRangeSlider = DateRangeSliderUI
+    @dateRangeSlider.tell "configure", {
       startYear: (new Date(DateFilterController.MIN_DATE)).getFullYear()
       endYear: (new Date(DateFilterController.MAX_DATE)).getFullYear()
       yearStep: 1
       initialStartYear: (new Date(@startDate)).getFullYear()
       initialEndYear: (new Date(@endDate)).getFullYear()
-    })
+    }
 
     @dateRangeSlider.subscribe "update-start", (start)=>
       @startDate = (new Date(start, 0)).valueOf()
@@ -52,7 +53,9 @@ class DateFilterController extends NNode
 
     @updatePlaybackSlider()
     @updateDateRange()
-    @postControllerChanges()
+
+    # When requested, update
+    @listen "request-update", @postControllerChanges
 
   # Limits the animated end date to fit in the start and end dates
   limitDatesJustInCase: ()->

@@ -57,16 +57,16 @@ That just about sums up the mechanics of the filter.
 ###
 
 NNode = require("./NNode")
-CacheFilter = require("./CacheFilter")
+MagnitudeFilter = require("./MagnitudeFilter")
 DateFilterController = require("./DateFilterController")
 
-module.exports =
+module.exports = new
 class DateFilter extends NNode
   constructor: ()->
     super
 
     # Rig up a controller
-    @controller = new DateFilterController()
+    @controller = DateFilterController
 
     @startDate = -Infinity
     @endDate = Infinity
@@ -76,6 +76,7 @@ class DateFilter extends NNode
       if updatedFilter.startDate > @startDate or updatedFilter.endDate < @endDate
 
         # Filter region has shrunk, thus data may be invalid
+
         @post "flush", @filterDates(@cachedData, updatedFilter.startDate, updatedFilter.endDate)
 
       else
@@ -88,7 +89,7 @@ class DateFilter extends NNode
         @filterDates @cachedData, @endDate, updatedFilter.endDate, additionalPoints
 
         # Stream the new data to the further filters
-        @post "stream", additionalPoints
+        @post "stream", additionalPoints if additionalPoints.length > 0
 
       # Update current filter state
       @startDate = updatedFilter.startDate
@@ -98,7 +99,7 @@ class DateFilter extends NNode
     @cachedData = []
 
     # Rig up the source filter
-    @inputNode = new CacheFilter()
+    @inputNode = MagnitudeFilter
 
     @inputNode.subscribe "stream", (newData)=>
       # Event upon incrementally receiving a new data chunk from the source
@@ -117,6 +118,7 @@ class DateFilter extends NNode
       @cachedData = freshData
       @post "flush", @filterDates(@cachedData, @startDate, @endDate)
 
+    @inputNode.tell "request-update"
   ###
   Creates a new array and fills it with the dataset, diced with given parameters
   Note: startDate is inclusive, endDate is exclusive

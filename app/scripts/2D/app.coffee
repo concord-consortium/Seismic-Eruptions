@@ -4,10 +4,10 @@ module.exports =
 class App extends NNode
   constructor: ()->
     super
-    $(document).on "pagecreate", ()=>
+    $(document).on "ready", ()=>
       # HACK: Make keyboard events on sliders work
       @superHackySliderKeyboardHack()
-      controller = new (require("./EarthquakeLayerManager"))
+      controller = require("./EarthquakeLayerManager")
 
   superHackySliderKeyboardHack: ()->
     # HACK HACK HACK HACK HACK HACK Please remove when the keyboard actually works

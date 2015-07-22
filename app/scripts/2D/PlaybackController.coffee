@@ -7,7 +7,7 @@ PlaybackButtonsUI = require("./PlaybackButtonsUI")
 PlaybackSliderUI = require("./PlaybackSliderUI")
 NNode = require("./NNode")
 
-module.exports =
+module.exports = new
 class PlaybackController extends NNode
   ###
   Creates a new PlaybackController.
@@ -33,7 +33,7 @@ class PlaybackController extends NNode
     @timeline.addPause(1)
 
     # Hook up some buttons
-    @playbackButtons = new PlaybackButtonsUI()
+    @playbackButtons = PlaybackButtonsUI
 
     # Listen for control messages from the buttons
     @playbackButtons.subscribe "update", (which)=>
@@ -43,7 +43,7 @@ class PlaybackController extends NNode
         when "speedup" then @speedUp()
 
     # Hook up that slider
-    @playbackSlider = new PlaybackSliderUI()
+    @playbackSlider = PlaybackSliderUI
 
     # Listen for control messages from the slider
     # to set playback progress

@@ -15,16 +15,7 @@
     <link rel="stylesheet" type='text/css' href="app-2d.css" />
     <style type='text/css'>
       /* Full screen the UI content area and map */
-      .ui-content {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        padding: 0;
-      }
-      #map {
-        height: 100%;
+      .ui-content, #map {
         position:absolute;
         top:0;
         bottom:0;
@@ -174,9 +165,9 @@
         <div id="map"></div>
         <div class="ui-bar ui-body-b ui-grid-b" id="controls">
           <div class="ui-grid-b ui-block-a" id="playcontrols">
-            <div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-backward ui-corner-all" id="slowdown" tabindex="1" accesskey="l" href="" title="Slower (S)"></a></div>
-            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-play ui-corner-all" id="playpause" tabindex="2" accesskey="p" href="" title="Play/Pause (P)"></a></div>
-            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-forward ui-corner-all" id="speedup" tabindex="3" accesskey="s" href="" title="Faster (F)"></a></div>
+            <div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-backward ui-corner-all" id="slowdown" tabindex="1" accesskey="l" href="" title="Slower"></a></div>
+            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-play ui-corner-all" id="playpause" tabindex="2" accesskey="p" href="" title="Play/Pause"></a></div>
+            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-forward ui-corner-all" id="speedup" tabindex="3" accesskey="s" href="" title="Faster"></a></div>
           </div>
           <div class="ui-block-b" id="slider-wrapper" data-enhance="false" data-role="none">
             <!-- Step and value to be set by code -->
@@ -185,9 +176,9 @@
               data-theme="b" data-track-theme="b" tabindex="4" data-highlight="true">
           </div>
           <div class="ui-block-c ui-grid-b">
-            <div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-gear ui-corner-all" id="display-options" tabindex="5" accesskey="o" title="Display Options (O)" data-rel="popup" href="#display-options-menu"></a></div>
-            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-star ui-corner-all" id="mapkey" tabindex="6" accesskey="k" href="" title="Map Key (K)"></a></div>
-            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-info ui-corner-all" id="info" tabindex="7" accesskey="i" href="" title="About and Credits (I)"></a></div>
+            <div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-gear ui-corner-all" id="display-options" tabindex="5" accesskey="o" title="Display Options" data-rel="popup" href="#display-options-menu"></a></div>
+            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-star ui-corner-all" id="mapkey" tabindex="6" accesskey="k" href="" title="Map Key"></a></div>
+            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-info ui-corner-all" id="info" tabindex="7" accesskey="i" href="" title="About and Credits"></a></div>
           </div>
         </div>
       </div>

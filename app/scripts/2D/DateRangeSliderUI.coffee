@@ -1,8 +1,8 @@
 NNode = require("./NNode")
 
-module.exports =
+module.exports = new
 class DateRangeSliderUI extends NNode
-  constructor: (options)->
+  constructor: ()->
     super
 
     # Rig up those date sliders
@@ -11,12 +11,13 @@ class DateRangeSliderUI extends NNode
     @dateSliderReadout = $("#date-slider-readout")
 
     # Configure them based on options
-    {startYear, endYear, yearStep, initialStartYear, initialEndYear} = options
-    @dateSliderStart.add(@dateSliderEnd)
-      .attr("min", startYear).attr("max", endYear).attr("step", yearStep)
-    @dateSliderStart.val(initialStartYear)
-    @dateSliderEnd.val(initialEndYear)
-    @dateSliderStart.add(@dateSliderEnd).slider("refresh")
+    @listen "configure", (options)=>
+      {startYear, endYear, yearStep, initialStartYear, initialEndYear} = options
+      @dateSliderStart.add(@dateSliderEnd)
+        .attr("min", startYear).attr("max", endYear).attr("step", yearStep)
+      @dateSliderStart.val(initialStartYear)
+      @dateSliderEnd.val(initialEndYear)
+      @dateSliderStart.add(@dateSliderEnd).slider("refresh")
 
     # Rig up some events
     @dateSliderStart.on "change", ()=>

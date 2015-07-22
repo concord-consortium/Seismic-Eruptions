@@ -3,38 +3,42 @@ A class to manage the magnitude filter, tying together the UI
 and the data filter
 ###
 NNode = require("./NNode")
-PlaybackController = require("./PlaybackController")
 MagnitudeSliderUI = require("./MagnitudeSliderUI")
-Utils = require("./Utils")
 
-module.exports =
+module.exports = new
 class MagnitudeFilterController extends NNode
   @MIN_MAGNITUDE: 3
   @MAX_MAGNITUDE: 9
   constructor: ()->
     super
-    @magnitude = 5
+    @minMagnitude = 5
 
     # Create and hook up a display options panel
-    @uiMagnitudeSlider = new MagnitudeSliderUI()
-    @connect(@uiMagnitudeSlider)
-    @listen "magnitude-change", (end)->
-      @magnitude = Utils.expandNorm(end,
-        MagnitudeFilterController.MIN_MAGNITUDE, MagnitudeFilterController.MAX_MAGNITUDE)
-      @tellEveryoneFilter()
-      @tellMagnitude()
+    @uiMagnitudeSlider = MagnitudeSliderUI
+    @uiMagnitudeSlider.subscribe "update", (value)=>
+      @minMagnitude = value
+      @postControllerChanges()
+      @updateMagnitudeSlider()
 
-    @tellMagnitude()
-    @tellEveryoneFilter()
+    @uiMagnitudeSlider.tell "configure", {
+      minMagnitude: MagnitudeFilterController.MIN_MAGNITUDE
+      maxMagnitude: MagnitudeFilterController.MAX_MAGNITUDE
+      magnitudeStep: 0.1
+      initialMinMagnitude: @minMagnitude
+    }
+
+    @updateMagnitudeSlider()
+
+    # When requested, update
+    @listen "request-update", @postControllerChanges
 
   # Tells everyone that the filter has changed
-  tellEveryoneFilter: ()->
-    @tellEveryone "filter-update", this
+  postControllerChanges: ()->
+    @post "update", {
+      minMagnitude: @minMagnitude
+    }
 
   # Tell the magnitude slider what to be set as
   # in the format (sliderValue, textToDisplay)
-  tellMagnitude: ()->
-    @tellEveryone "magnitude-filter-update",
-      Utils.contractNorm(@magnitude,
-        MagnitudeFilterController.MIN_MAGNITUDE, MagnitudeFilterController.MAX_MAGNITUDE),
-      "#{@magnitude.toFixed(1)}"
+  updateMagnitudeSlider: ()->
+    @uiMagnitudeSlider.tell "set-text", "#{@minMagnitude.toFixed(1)}"

@@ -4,7 +4,7 @@ A small class to hook up the playback slider
 
 NNode = require("./NNode")
 
-module.exports =
+module.exports = new
 class PlaybackSliderUI extends NNode
 
   constructor: ()->

@@ -1,6 +1,10 @@
+###
+A class to manage the magnitude slider
+###
+
 NNode = require("./NNode")
 
-module.exports =
+module.exports = new
 class MagnitudeSliderUI extends NNode
   constructor: ()->
     super
@@ -10,13 +14,23 @@ class MagnitudeSliderUI extends NNode
     # Rig up those magnitude sliders
     @magnitudeSlider = $("#magnitude-slider")
     @magnitudeSliderReadout = $("#magnitude-readout")
+
+    @listen "configure", (options)=>
+      {minMagnitude, maxMagnitude, magnitudeStep, initialMinMagnitude} = options
+      @magnitudeSlider
+        .attr("min", minMagnitude).attr("max", maxMagnitude).attr("step", magnitudeStep)
+      @magnitudeSlider.val(initialMinMagnitude)
+      @magnitudeSlider.slider("refresh")
+
     @magnitudeSlider.on "change", ()=>
       unless preventChangeFromHappenningHack
-        @tellEveryone "magnitude-change", parseFloat(@magnitudeSlider.val())
+        @post "update", parseFloat(@magnitudeSlider.val())
 
     # When magnitude filter is updated, adjust the readout and tweak the slider value
-    @listen "magnitude-filter-update", (sliderVal, text)->
+    @listen "set", (value)->
       preventChangeFromHappenningHack = yes
       @magnitudeSlider.val(sliderVal).slider("refresh")
-      @magnitudeSliderReadout.text(text)
       preventChangeFromHappenningHack = no
+
+    @listen "set-text", (text)->
+      @magnitudeSliderReadout.text(text)

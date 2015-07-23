@@ -1,137 +1,73 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Seismic Eruptions</title>
-    <meta http-equiv='Content-Type' content='text/html, charset=utf-8'/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
 
-    <link rel="stylesheet" type='text/css' href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-    <link rel="stylesheet" type='text/css' href="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
-    <link rel="stylesheet" type='text/css' href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
-    <link rel="stylesheet" type='text/css' href="//cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.css" />
-    <!--<link rel="stylesheet" type='text/css' href="../../../vendor/styles/font-awesome.css" />
+<head>
+  <title>Seismic Eruptions</title>
+  <meta http-equiv='Content-Type' content='text/html, charset=utf-8' />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+
+  <link rel="stylesheet" type='text/css' href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+  <link rel="stylesheet" type='text/css' href="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
+  <link rel="stylesheet" type='text/css' href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+  <link rel="stylesheet" type='text/css' href="//cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.css" />
+  <!--<link rel="stylesheet" type='text/css' href="../../../vendor/styles/font-awesome.css" />
     <link rel="stylesheet" type='text/css' href="../../../vendor/styles/leaflet.draw.css" />-->
-    <link rel="stylesheet" type='text/css' href="vendor-2d.css" />
-    <link rel="stylesheet" type='text/css' href="app-2d.css" />
-    <style type='text/css'>
-      /* Full screen the UI content area and map */
-      .ui-content, #map {
-        position:absolute;
-        top:0;
-        bottom:0;
-        left:0;
-        right:0;
-        margin: 0;
-        padding: 0;
-        z-index: 0;
-      }
-      /*.ui-icon-knife:after {
-        background-image: url("../images/knife-dashed-line.png");
-        background-size: 18px 18px;
-      }*/
-      /* Positions the controls properly */
-      #controls {
-        text-align: center;
-        padding: 0;
-        position:absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 100;
-      }
-      #show-controls {
-        position: absolute;
-        right: 4.1666%;
-        /* Note: these two margin values are quite the hax */
-        margin-right: -24px;
-        margin-bottom: 0.95em;
-        bottom: 0;
-        z-index: 50;
-      }
-      /* Give more room to the slider and less to the buttons on both sides */
-      #controls > .ui-block-a{
-        width: 25%;
-      }
-      #controls > .ui-block-b{
-        width: 50%;
-      }
-      #controls > .ui-block-c{
-        width: 25%;
-      }
-      /* Make the slider look consistent with the buttons */
-      .ui-slider-track, #display-options-menu .ui-rangeslider-sliders{
-        margin-left: 35px;
-        margin-right: 35px;
-      }
-      #slider-wrapper .ui-slider-track {
-        margin: 0.5em 55px;
-      }
-      /*Hack the slider handle to make a date fit in it*/
-      #slider-wrapper .ui-slider-handle{
-        width: 95px;
-        margin-left: -55px;
-        text-align: right;
-        padding-right: 10px;
-      }
-      /* Adjust positioning for the display options */
-      #display-options-menu{
-        position: absolute;
-        /* This is somewhat a hack, figure out if can be removed */
-        left: -350px;
-        top: -380px;
-        width: 400px;
-        height: 330px;
-      }
-    </style>
+  <link rel="stylesheet" type='text/css' href="vendor-2d.css" />
+  <link rel="stylesheet" type='text/css' href="app-2d.css" />
 
-    <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript">
-      $(document).bind("mobileinit", function(){
-        $.mobile.hashListeningEnabled = false;
-        $.mobile.pushStateEnabled = false;
-      });
-    </script>
-    <script type="text/javascript" src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-    <script type="text/javascript" src="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.12/jquery.mousewheel.min.js"></script>
-    <script type="text/javascript" src="//fgnass.github.io/spin.js/spin.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
-    <script type="text/javascript" src="vendor-2d.js"></script>
-    <script type="text/javascript" src="app-2d.js"></script>
+  <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript">
+    $(document).bind("mobileinit", function () {
+      $.mobile.hashListeningEnabled = false;
+      $.mobile.pushStateEnabled = false;
+    });
+  </script>
+  <script type="text/javascript" src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+  <script type="text/javascript" src="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.12/jquery.mousewheel.min.js"></script>
+  <script type="text/javascript" src="//fgnass.github.io/spin.js/spin.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+  <script type="text/javascript" src="vendor-2d.js"></script>
+  <script type="text/javascript" src="app-2d.js"></script>
 
-  </head>
-  <body>
-    <div data-role="page" id="index">
-      <div data-role="popup" data-theme="b" class='ui-content' id="display-options-menu" style="overflow: visible;">
-        <div class="ui-body">
-          <p>
-            <div data-role="rangeslider">
-              <label for="date-slider-start">Restrict to earthquakes between <b id="date-slider-readout">_</b></label>
-              <!-- Min, max, step, and value to be set by code -->
-              <input name="date-slider-start" id="date-slider-start" min="0" max="0" value="0" step="0" type="range" style="display:none;"/>
-              <input name="date-slider-end" id="date-slider-end" min="0" max="0" value="0" step="0" type="range" style="display:none;"/>
-            </div>
-          </p>
-          <p>
-            <label for='magnitude-slider'>Only show earthquakes magnitude <b id="magnitude-readout">_</b> or stronger</label>
+</head>
+
+<body>
+  <div data-role="page" id="index">
+    <div data-role="popup" data-theme="b" class='ui-content' id="display-options-menu" data-arrow="b" style="overflow: visible;">
+      <div class="ui-body">
+        <p>
+          <div data-role="rangeslider">
+            <label for="date-slider-start">Restrict to earthquakes between <b id="date-slider-readout">_</b></label>
             <!-- Min, max, step, and value to be set by code -->
-            <input id="magnitude-slider" name="magnitude-slider" type="range" range="max" min="0" max="0" value="0" step="0" data-highlight="true" style="display:none;">
-          </p>
-          <p>
-            <label for="plate-toggle">Show Plate Boundaries</label>
-            <input data-role="flipswitch" data-mini="true" type="checkbox" name="plate-toggle" id="plate-toggle">
-          </p>
-          <p>
-            <label for="base-map-selector">Displayed Map Type</label>
-            <select name="base-map-selector" id="base-map-selector" data-native-menu="false" data-mini="true">
-              <option value="density">Earthquake Density Map (PRCC)</option>
-              <option value="satellite" selected>Satellite Map</option>
-              <option value="street">Street Map (OSM)</option>
-            </select>
-          </p>
-          <!-- Sorry, daterange. Maybe another day.
+            <input name="date-slider-start" id="date-slider-start" min="0" max="0" value="0" step="0" type="range" style="display:none;" />
+            <input name="date-slider-end" id="date-slider-end" min="0" max="0" value="0" step="0" type="range" style="display:none;" />
+          </div>
+        </p>
+        <p>
+          <label for='magnitude-slider'>Only show earthquakes magnitude <b id="magnitude-readout">_</b> or stronger</label>
+          <!-- Min, max, step, and value to be set by code -->
+          <input id="magnitude-slider" name="magnitude-slider" type="range" range="max" min="0" max="0" value="0" step="0" data-highlight="true" style="display:none;">
+        </p>
+        <p>
+          <label for="plate-toggle">Show Map Key</label>
+          <input data-role="flipswitch" data-mini="true" type="checkbox" name="map-key-toggle" id="map-key-toggle">
+        </p>
+        <p>
+          <label for="plate-toggle">Show Plate Boundaries</label>
+          <input data-role="flipswitch" data-mini="true" type="checkbox" name="plate-toggle" id="plate-toggle">
+        </p>
+        <p>
+          <label for="base-map-selector">Displayed Map Type</label>
+          <select name="base-map-selector" id="base-map-selector" data-native-menu="false" data-mini="true">
+            <option value="density">Earthquake Density Map (PRCC)</option>
+            <option value="satellite" selected>Satellite Map</option>
+            <option value="street">Street Map (OSM)</option>
+          </select>
+        </p>
+        <!-- Sorry, daterange. Maybe another day.
             <div id="daterange"></div>
             <div id="daterange-picker-left" style="float: left; display: none;"></div>
             <div id="daterange-picker-right" style="float: left; display: none;"></div>
@@ -150,9 +86,9 @@
               <a id="share-link" href='#' target='_blank' style='word-break: break-word; -webkit-hyphens: auto; -moz-hyphens: auto; hyphens: auto;'></a>
             </h6>
           </div>-->
-        </div>
       </div>
-       <!-- <div data-role="panel" data-position="right" data-displa="overlay" data-theme="b" id="settings">
+    </div>
+    <!-- <div data-role="panel" data-position="right" data-displa="overlay" data-theme="b" id="settings">
         <form>
           <div class="ui-field-contain">
             <label for="plates">Plate-boundaries</label>
@@ -167,34 +103,68 @@
           </div>
         </form>
       </div> -->
-
-      <div data-role="content" data-theme="b">
-        <div id="map"></div>
-        <div class="ui-bar ui-body-b ui-grid-b" id="controls">
-          <div class="ui-grid-b ui-block-a" id="playcontrols">
-            <div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-backward ui-corner-all" id="slowdown" tabindex="1" accesskey="l" href="" title="Slower"></a></div>
-            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-play ui-corner-all" id="playpause" tabindex="2" accesskey="p" href="" title="Play/Pause"></a></div>
-            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-forward ui-corner-all" id="speedup" tabindex="3" accesskey="s" href="" title="Faster"></a></div>
+    <div data-role="content" data-theme="b">
+      <div id="map"></div>
+      <div class="ui-bar-b ui-grid-b" id="controls">
+        <div class="ui-grid-b ui-block-a" id="playcontrols">
+          <div class="ui-block-a">
+            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-backward ui-corner-all" id="slowdown" tabindex="1" accesskey="l" href="" title="Slower"></a>
           </div>
-          <div class="ui-block-b" id="slider-wrapper" data-enhance="false" data-role="none">
-            <!-- Step and value to be set by code -->
-            <input id="slider" name="slider" type="range" min="0"
-              max="1" value="0" step="0" style="display:none;"
-              data-theme="b" data-track-theme="b" tabindex="4" data-highlight="true">
+          <div class="ui-block-b">
+            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-play ui-corner-all" id="playpause" tabindex="2" accesskey="p" href="" title="Play/Pause"></a>
           </div>
-          <div class="ui-block-c ui-grid-b">
-            <div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-gear ui-corner-all" id="display-options" tabindex="5" accesskey="o" title="Display Options" data-rel="popup" href="#display-options-menu"></a></div>
-            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-info ui-corner-all" id="about" tabindex="6" accesskey="i" href="#about-pane" title="Info"></a></div>
-            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-chevron-down ui-corner-all" id="hide-controls" tabindex="7" accesskey="h" href="" title="Hide Controls"></a></div>
+          <div class="ui-block-c">
+            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-forward ui-corner-all" id="speedup" tabindex="3" accesskey="s" href="" title="Faster"></a>
           </div>
         </div>
-        <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-chevron-up ui-corner-all" id="show-controls" href="" title="Show Controls"></a>
+        <div class="ui-block-b" id="slider-wrapper" data-enhance="false" data-role="none">
+          <!-- Step and value to be set by code -->
+          <input id="slider" name="slider" type="range" min="0" max="1" value="0" step="0" style="display:none;" data-theme="b" data-track-theme="b" tabindex="4" data-highlight="true">
+        </div>
+        <div class="ui-block-c ui-grid-b">
+          <div class="ui-block-a">
+            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-gear ui-corner-all" id="display-options" tabindex="5" accesskey="o" title="Display Options" data-rel="popup" href="#display-options-menu"></a>
+          </div>
+          <div class="ui-block-b">
+            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-info ui-corner-all" id="about" tabindex="6" accesskey="i" href="#about-pane" title="Info"></a>
+          </div>
+          <div class="ui-block-c">
+            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-chevron-down ui-corner-all" id="hide-controls" tabindex="7" accesskey="h" href="" title="Hide Controls"></a>
+          </div>
+        </div>
       </div>
+      <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-chevron-up ui-corner-all" id="show-controls" href="" title="Show Controls"></a>
+      <div id="map-key" class="ui-popup-container fade ui-popup-active ui-body-inherit ui-overlay-shadow ui-corner-all">
+        <div class="ui-body">
+          <h4>Map Key</h4>
+          <div class="ui-grid-a">
+            <div class="key-column ui-block-a">
+              <p>Magnitude</p>
+              <div class="space-please magnitude-key">
+                <!-- Items generated by code, looks like -->
+                <!-- <div class="magnitude-item"><div class="magnitude-example" style="width: 10px; height: 10px; margin-left: -5px; margin-top: -5px;"></div>1</div> -->
 
+              </div>
+            </div>
+            <div class="key-column ui-block-b">
+              <p>Depth</p>
+              <div class="space-please depth-key">
+                <div class="depth-gradient"></div>
+                <div class="labels">
+                  <!-- Labels generated by code, looks like -->
+                  <!-- 1<br>2<br>3 -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <script  type="text/javascript">
-      var App = require('2D/app'),
-          app = new App(); // some comment
-    </script>
-  </body>
+  </div>
+  <script type="text/javascript">
+    var App = require('2D/app'),
+      app = new App(); // some comment
+  </script>
+</body>
+
 </html>

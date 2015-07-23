@@ -5,6 +5,7 @@ A class to manage the date filter, connecting the data filter to the
 NNode = require("./NNode")
 PlaybackController = require("./PlaybackController")
 DateRangeSliderUI = require("./DateRangeSliderUI")
+DataFormatter = require("./DataFormatter")
 Utils = require("./Utils")
 
 module.exports = new
@@ -23,7 +24,7 @@ class DateFilterController extends NNode
     @playbackController = PlaybackController
 
     @playbackController.subscribe "update", (progress)=>
-      @animatedEndDate = Utils.expandNorm(progress, @startDate, @endDate)
+      @animatedEndDate = progress * (@endDate - @startDate) + @startDate
       @postControllerChanges()
       @updatePlaybackSliderTextOnly()
 
@@ -72,12 +73,12 @@ class DateFilterController extends NNode
   updatePlaybackSliderTextOnly: ()->
     # Set the playhead text
     @playbackController.tell "set-text",
-      "#{Utils.formatDate(@animatedEndDate)}"
+      "#{DataFormatter.formatDate(@animatedEndDate)}"
 
   updatePlaybackSlider: ()->
     # Set the playhead depending on new start and end ranges
     @playbackController.tell "set",
-      Utils.contractNorm(@animatedEndDate, @startDate, @endDate)
+      (@animatedEndDate - @startDate) / (@endDate - @startDate)
 
     # Set the playhead step (1/#days between start and end)
     msBetweenStartAndEnd = @endDate - @startDate

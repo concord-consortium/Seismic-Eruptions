@@ -8,12 +8,13 @@ module.exports = new
 class MapView extends NNode
   constructor: ()->
     super
-    window.l = @leafletMap = L.map("map", {worldCopyJump: true})
+    @leafletMap = L.map("map", {worldCopyJump: true})
 
     # TODO: Move this into LocationManager
-    @leafletMap.fitBounds(L.latLngBounds(L.latLng(-50, -40), L.latLng(50, 40)))
-    
-    @leafletMap.invalidateSize(true)
+
+    $(window).on "load", ()=>
+      @leafletMap.fitBounds(L.latLngBounds(L.latLng(-50, -40), L.latLng(50, 40)))
+      @leafletMap.invalidateSize(true)
 
     @listen "add-layer", (layer)=>
       @leafletMap.addLayer(layer)

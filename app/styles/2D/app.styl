@@ -1,0 +1,125 @@
+// Full screen the UI content area and map
+.ui-content, #map
+  position absolute
+  top 0
+  bottom 0
+  left 0
+  right 0
+  margin 0
+  padding 0
+  z-index 0
+
+// Style the map's zoom in/out buttons properly
+#map .leaflet-control-zoom > a
+  // NOTE Taken from jQuery mobile.
+  background-color #2a2a2a
+  border-color #1d1d1d
+  color #fff
+  text-shadow 0 1px 0 #111
+
+/*.ui-icon-knife after
+  background-image url("../images/knife-dashed-line.png")
+  background-size 18px 18px
+*/
+// Positions the controls properly
+#controls
+  text-align center
+  padding 0
+  position absolute
+  left 0
+  right 0
+  bottom 0
+  z-index 100
+
+  // Give more room to the slider and less to the buttons on the sides
+  & > .ui-block-a
+    width 25%
+  & > .ui-block-b
+    width 50%
+  & > .ui-block-c
+    width 25%
+
+// This is the "show controls" button. It hides behind the controls until they are hidden.
+#show-controls
+  position absolute
+  right 4.1666%
+  // Note these two margin values are quite the hax
+  margin-right -24px
+  margin-bottom 0.95em
+  bottom 0
+  z-index 50
+
+// Make the slider look consistent with the buttons
+#display-options-menu
+  .ui-slider-track
+    margin-left 14px
+    margin-right 14px
+  .ui-rangeslider-sliders
+    margin-left 0
+    margin-right 0
+
+#slider-wrapper
+  .ui-slider-track
+    margin 0.5em 55px
+
+  // Hack the playback slider handle to make a date fit in it
+  .ui-slider-handle
+    width 95px
+    margin-left -55px
+    text-align right
+    padding-right 10px
+
+
+// Adjust positioning for the display options
+#display-options-menu
+  position absolute
+  // This is somewhat a hack, figure out if can be removed
+  left -210px
+  top -40px
+  width 400px
+  height 410px
+
+  // Center the bottom arrow
+  // This is somewhat a hack, figure out if can be removed
+  .ui-popup-arrow-container
+    margin-left 190px
+
+// Map key fun!
+DEPTH_GRADIENT_WIDTH = 20px
+EXTRA_SPACING = 10px
+MAX_MAGNITUDE_SIZE = 50px
+#map-key
+  position absolute
+  right 10px
+  top 10px
+  z-index 75
+  .space-please, h4, p
+    margin .5em 0
+  .key-column
+    min-width 110px
+  .depth-key
+    position relative
+    padding-left (DEPTH_GRADIENT_WIDTH + EXTRA_SPACING)
+    margin-top 22px
+    .depth-gradient
+      position absolute
+      width DEPTH_GRADIENT_WIDTH
+      top 0
+      bottom 0
+      left 0
+      background-color red
+      background-image linear-gradient(red, yellow, green, blue)
+    .labels p
+      margin-bottom 27px
+  .magnitude-key
+    .magnitude-item
+      position relative
+      height MAX_MAGNITUDE_SIZE - EXTRA_SPACING
+      padding-left (MAX_MAGNITUDE_SIZE + EXTRA_SPACING)
+      padding-top (MAX_MAGNITUDE_SIZE/2 - 10)
+      .magnitude-example
+        border 1.5px solid white
+        border-radius 100%
+        position absolute
+        top (MAX_MAGNITUDE_SIZE/2)
+        left (MAX_MAGNITUDE_SIZE/2)

@@ -1,10 +1,10 @@
-
+/*
 .crosssection-popup {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 7px; /* Gets rid of a vertical scroll bar */
+  bottom: 7px; /* Gets rid of a vertical scroll bar *//*
   z-index: 1000;
   background-color: black;
 }
@@ -47,3 +47,4 @@
 .ui-datepicker {
   z-index: 1199 !important
 }
+*/

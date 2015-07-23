@@ -20,9 +20,9 @@ class App extends NNode
     # I'd believe it's more robust - we don't discriminate which button
     @controlsUI.subscribe "update", ()=>
       # Toggle control visibility
-      if @controlsVisible
-        @controls.finish().slideUp(500)
-      else
-        @controls.finish().slideDown(500)
-
       @controlsVisible = !@controlsVisible
+
+      if @controlsVisible
+        @controls.finish().slideDown(300)
+      else
+        @controls.finish().slideUp(300)

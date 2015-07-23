@@ -7,7 +7,7 @@ TODO: HORRIBLY INCOMPLETE
 NNode = require("./NNode")
 DateFilter = require("./DateFilter")
 MapView = require("./MapView")
-Utils = require("./Utils")
+DataFormatter = require("./DataFormatter")
 
 module.exports = new
 class EarthquakeLayerManager extends NNode
@@ -65,10 +65,6 @@ class EarthquakeLayerManager extends NNode
     if @earthquakesLayer?
       @mapView.tell "remove-layer", @earthquakesLayer
 
-    # Find a better home for this rainbow?
-    rainbow = new Rainbow()
-    rainbow.setNumberRange(0, 700)
-
     # Here's where some formatting magic occurs
     @earthquakesLayer = L.geoJson [], {
       pointToLayer: (feature, latlng) ->
@@ -83,8 +79,8 @@ class EarthquakeLayerManager extends NNode
           color: "#000"
           # Fill
           fillOpacity: 0.5
-          fillColor: "#" + rainbow.colourAt(depth)
-          radius: 0.9 * Math.pow(1.5, (magnitude - 1))
+          fillColor: DataFormatter.depthToColor(depth)
+          radius: DataFormatter.magnitudeToRadius(magnitude)
         }
 
         # Create a marker with the given style
@@ -93,8 +89,8 @@ class EarthquakeLayerManager extends NNode
         # Add a popup to it
         marker.bindPopup("""
         Place: <b>#{feature.properties.place}</b></br>
-        Magnitude: <b>#{magnitude.toFixed(1)}</b></br>
-        Date: <b>#{Utils.formatDate(new Date(feature.properties.time))}</b></br>
+        Magnitude: <b>#{DataFormatter.formatMagnitude(magnitude)}</b></br>
+        Date: <b>#{DataFormatter.formatDate(feature.properties.time)}</b></br>
         Depth: <b>#{depth} km</b>
         """)
 

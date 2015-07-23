@@ -4,6 +4,7 @@ and the data filter
 ###
 NNode = require("./NNode")
 MagnitudeSliderUI = require("./MagnitudeSliderUI")
+DataFormatter = require("./DataFormatter")
 
 module.exports = new
 class MagnitudeFilterController extends NNode
@@ -41,4 +42,4 @@ class MagnitudeFilterController extends NNode
   # Tell the magnitude slider what to be set as
   # in the format (sliderValue, textToDisplay)
   updateMagnitudeSlider: ()->
-    @uiMagnitudeSlider.tell "set-text", "#{@minMagnitude.toFixed(1)}"
+    @uiMagnitudeSlider.tell "set-text", "#{DataFormatter.formatMagnitude(@minMagnitude)}"

@@ -4,13 +4,15 @@ module.exports =
 class App extends NNode
   constructor: ()->
     super
-    $(document).on "ready", ()=>
+    $(document).on "pagecreate", ()=>
       # HACK: Make keyboard events on sliders work
       @superHackySliderKeyboardHack()
       require("./EarthquakeLayerManager")
       require("./BoundariesLayerManager")
       require("./BaseMapLayerManager")
       require("./ControlsManager")
+      require("./MapKeyController")
+
   superHackySliderKeyboardHack: ()->
     # HACK HACK HACK HACK HACK HACK Please remove when the keyboard actually works
     $("#slider-wrapper .ui-slider-handle").keydown (event)->

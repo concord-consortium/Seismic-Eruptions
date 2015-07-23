@@ -10,17 +10,20 @@ class App extends NNode
       require("./EarthquakeLayerManager")
       require("./BoundariesLayerManager")
       require("./BaseMapLayerManager")
+      require("./ControlsManager")
   superHackySliderKeyboardHack: ()->
     # HACK HACK HACK HACK HACK HACK Please remove when the keyboard actually works
     $("#slider-wrapper .ui-slider-handle").keydown (event)->
       input = $(this).parents(".ui-slider").find("input")
-      input.val switch event.keyCode
+      switch event.keyCode
         when $.mobile.keyCode.HOME
-          parseFloat(input.attr("min"))
+          newValue = parseFloat(input.attr("min"))
         when $.mobile.keyCode.END
-          parseFloat(input.attr("max"))
+          newValue = parseFloat(input.attr("max"))
         when $.mobile.keyCode.PAGE_UP, $.mobile.keyCode.UP, $.mobile.keyCode.LEFT
-          parseFloat(input.val()) - parseFloat(input.attr("step"))
+          newValue = parseFloat(input.val()) - parseFloat(input.attr("step"))
         when $.mobile.keyCode.PAGE_DOWN, $.mobile.keyCode.DOWN, $.mobile.keyCode.RIGHT
-          parseFloat(input.val()) + parseFloat(input.attr("step"))
+          newValue = parseFloat(input.val()) + parseFloat(input.attr("step"))
+        else return
+      input.val(newValue)
       $(input).slider("refresh")

@@ -23,6 +23,7 @@
         right:0;
         margin: 0;
         padding: 0;
+        z-index: 0;
       }
       /*.ui-icon-knife:after {
         background-image: url("../images/knife-dashed-line.png");
@@ -36,6 +37,16 @@
         left: 0;
         right: 0;
         bottom: 0;
+        z-index: 100;
+      }
+      #show-controls {
+        position: absolute;
+        right: 4.1666%;
+        /* Note: these two margin values are quite the hax */
+        margin-right: -24px;
+        margin-bottom: 0.95em;
+        bottom: 0;
+        z-index: 50;
       }
       /* Give more room to the slider and less to the buttons on both sides */
       #controls > .ui-block-a{
@@ -53,11 +64,7 @@
         margin-right: 35px;
       }
       #slider-wrapper .ui-slider-track {
-        margin-left: 55px;
-        margin-right: 55px;
-      }
-      #slider-wrapper {
-        margin: 0.5em 0;
+        margin: 0.5em 55px;
       }
       /*Hack the slider handle to make a date fit in it*/
       #slider-wrapper .ui-slider-handle{
@@ -177,10 +184,11 @@
           </div>
           <div class="ui-block-c ui-grid-b">
             <div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-gear ui-corner-all" id="display-options" tabindex="5" accesskey="o" title="Display Options" data-rel="popup" href="#display-options-menu"></a></div>
-            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-star ui-corner-all" id="mapkey" tabindex="6" accesskey="k" href="" title="Map Key"></a></div>
-            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-info ui-corner-all" id="info" tabindex="7" accesskey="i" href="" title="About and Credits"></a></div>
+            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-info ui-corner-all" id="about" tabindex="6" accesskey="i" href="#about-pane" title="Info"></a></div>
+            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-chevron-down ui-corner-all" id="hide-controls" tabindex="7" accesskey="h" href="" title="Hide Controls"></a></div>
           </div>
         </div>
+        <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-chevron-up ui-corner-all" id="show-controls" href="" title="Show Controls"></a>
       </div>
 
     </div>

@@ -1,3 +1,4 @@
+
 ###
 EarthquakeLayerManager - A class to manage the Leaflet earthquake layer and populate it with points
 from the filters that lead into it
@@ -78,7 +79,7 @@ class EarthquakeLayerManager extends NNode
           opacity: 0.2
           color: "#000"
           # Fill
-          fillOpacity: 0.5
+          fillOpacity: 0.8
           fillColor: DataFormatter.depthToColor(depth)
           radius: DataFormatter.magnitudeToRadius(magnitude)
         }

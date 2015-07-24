@@ -36,76 +36,62 @@
 
 <body>
   <div data-role="page" id="index">
-    <div data-role="popup" data-theme="b" class='ui-content' id="display-options-menu" data-arrow="b" style="overflow: visible;">
+    <div data-role="popup" class='ui-content' id="display-options-menu" data-arrow="b" style="overflow: visible;">
       <div class="ui-body">
-        <p>
+        <div class="space-please">
           <div data-role="rangeslider">
             <label for="date-slider-start">Restrict to earthquakes between <b id="date-slider-readout">_</b></label>
             <!-- Min, max, step, and value to be set by code -->
             <input name="date-slider-start" id="date-slider-start" min="0" max="0" value="0" step="0" type="range" style="display:none;" />
             <input name="date-slider-end" id="date-slider-end" min="0" max="0" value="0" step="0" type="range" style="display:none;" />
           </div>
-        </p>
-        <p>
+        </div>
+        <div class="space-please">
           <label for='magnitude-slider'>Only show earthquakes magnitude <b id="magnitude-readout">_</b> or stronger</label>
           <!-- Min, max, step, and value to be set by code -->
           <input id="magnitude-slider" name="magnitude-slider" type="range" range="max" min="0" max="0" value="0" step="0" data-highlight="true" style="display:none;">
-        </p>
-        <p>
-          <label for="plate-toggle">Show Map Key</label>
-          <input data-role="flipswitch" data-mini="true" type="checkbox" name="map-key-toggle" id="map-key-toggle">
-        </p>
-        <p>
-          <label for="plate-toggle">Show Plate Boundaries</label>
-          <input data-role="flipswitch" data-mini="true" type="checkbox" name="plate-toggle" id="plate-toggle">
-        </p>
-        <p>
-          <label for="base-map-selector">Displayed Map Type</label>
-          <select name="base-map-selector" id="base-map-selector" data-native-menu="false" data-mini="true">
-            <option value="density">Earthquake Density Map (PRCC)</option>
-            <option value="satellite" selected>Satellite Map</option>
-            <option value="street">Street Map (OSM)</option>
-          </select>
-        </p>
-        <!-- Sorry, daterange. Maybe another day.
-            <div id="daterange"></div>
-            <div id="daterange-picker-left" style="float: left; display: none;"></div>
-            <div id="daterange-picker-right" style="float: left; display: none;"></div>
-            <div id="share-wrapper" data-mini="true">
-            <div style="padding-top: 10px;">
-              <label for='magnitude-slider'>Magnitude cutoff:</label>
-              <input id="magnitude-slider" name="magnitude-slider" type="range" min="1" max="9" value="5" step="0.1" >
-            </div>
-            <a href="#" class="ui-btn ui-btn-b ui-btn-inline ui-shadow ui-corner-all ui-mini ui-icon-search ui-btn-icon-right" id="getQuakeCount"> Get Count </a>
-            <a href="#" class="ui-btn ui-btn-b ui-btn-inline ui-shadow ui-corner-all ui-mini ui-icon-forward ui-btn-icon-right" id="loadSelectedData"> Show Me </a>
-            <a href="#" class="ui-btn ui-btn-b ui-btn-inline ui-shadow ui-corner-all ui-mini ui-icon-action ui-btn-icon-right" id="shareSelectedData"> Share </a>
+        </div>
+        <div class="space-please ui-grid-a">
+          <div class="ui-block-a">
+            <label for="plate-toggle">Show Map Key</label>
+            <input data-role="flipswitch" type="checkbox" name="map-key-toggle" id="map-key-toggle">
           </div>
-          <div id="share-wrapper" data-mini="true">
-            <h6>
-              Give this link to share:<br/>
-              <a id="share-link" href='#' target='_blank' style='word-break: break-word; -webkit-hyphens: auto; -moz-hyphens: auto; hyphens: auto;'></a>
-            </h6>
-          </div>-->
+          <div class="ui-block-b">
+            <label for="plate-toggle">Show Plate Boundaries</label>
+            <input data-role="flipswitch" type="checkbox" name="plate-toggle" id="plate-toggle">
+          </div>
+        </div>
+        <div class="space-please">
+          <label for="base-map-selector">Displayed Map Type</label>
+          <select name="base-map-selector" id="base-map-selector" data-native-menu="false">
+            <option value="density">Earthquake Density Map</option>
+            <option value="satellite" selected>Satellite Map</option>
+            <option value="street">Street Map</option>
+          </select>
+        </div>
       </div>
     </div>
-    <!-- <div data-role="panel" data-position="right" data-displa="overlay" data-theme="b" id="settings">
-        <form>
-          <div class="ui-field-contain">
-            <label for="plates">Plate-boundaries</label>
-            <input data-role="flipswitch" data-mini="true" type="checkbox" name="plates" id="plates" onchange="app.map.plateToggle()">
-          </div>
-          <div class="ui-field-contain ui-mini">
-            <select name="mapselector" id="mapselector" data-native-menu="false" data-mini="true">
-              <option value="1">PRCC Earthquake density map</option>
-              <option value="2" selected>Satellite map</option>
-              <option value="3">OSM map</option>
-            </select>
-          </div>
-        </form>
-      </div> -->
-    <div data-role="content" data-theme="b">
+    <div data-role="popup" class='ui-content' id="info-credits-pane" data-arrow="b" style="overflow: visible;">
+      <div class="ui-body">
+        <h4>Seismic Eruptions</h4>
+        <div class="space-please">
+          <label for="sharing-link">Share with link</label>
+          <input type="text" name="sharing-link" value="TODO">
+        </div>
+        <div class="space-please">
+          View the project on <a href="https://github.com/concord-consortium/Seismic-Eruptions">GitHub</a>
+        </div>
+        <div class="space-please">
+          <i>
+            Credits to PRCC for the Earthquake Density  map layer and OSM for the Street map
+          </i>
+        </div>
+        <!-- TODO: Adjust these contents and add more -->
+      </div>
+    </div>
+    <div data-role="content">
       <div id="map"></div>
-      <div class="ui-bar-b ui-grid-b" id="controls">
+      <div class="ui-bar ui-grid-b" id="controls">
         <div class="ui-grid-b ui-block-a" id="playcontrols">
           <div class="ui-block-a">
             <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-backward ui-corner-all" id="slowdown" tabindex="1" accesskey="l" href="" title="Slower"></a>
@@ -119,28 +105,28 @@
         </div>
         <div class="ui-block-b" id="slider-wrapper" data-enhance="false" data-role="none">
           <!-- Step and value to be set by code -->
-          <input id="slider" name="slider" type="range" min="0" max="1" value="0" step="0" style="display:none;" data-theme="b" data-track-theme="b" tabindex="4" data-highlight="true">
+          <input id="slider" name="slider" type="range" min="0" max="1" value="0" step="0" style="display:none;" tabindex="4" data-highlight="true">
         </div>
         <div class="ui-block-c ui-grid-b">
           <div class="ui-block-a">
             <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-gear ui-corner-all" id="display-options" tabindex="5" accesskey="o" title="Display Options" data-rel="popup" href="#display-options-menu"></a>
           </div>
           <div class="ui-block-b">
-            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-info ui-corner-all" id="about" tabindex="6" accesskey="i" href="#about-pane" title="Info"></a>
+            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-info ui-corner-all" id="about" tabindex="6" accesskey="i" data-rel="popup" href="#info-credits-pane" title="Info"></a>
           </div>
           <div class="ui-block-c">
             <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-chevron-down ui-corner-all" id="hide-controls" tabindex="7" accesskey="h" href="" title="Hide Controls"></a>
           </div>
         </div>
       </div>
-      <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-chevron-up ui-corner-all" id="show-controls" href="" title="Show Controls"></a>
+      <a class="ui-btn ui-btn ui-shadow ui-icon-fa ui-icon-fa-chevron-up ui-corner-all" id="show-controls" href="" title="Show Controls" style="display:none"></a>
       <div id="map-key" class="ui-popup-container fade ui-popup-active ui-body-inherit ui-overlay-shadow ui-corner-all">
         <div class="ui-body">
           <h4>Map Key</h4>
           <div class="ui-grid-a">
             <div class="key-column ui-block-a">
               <p>Magnitude</p>
-              <div class="space-please magnitude-key">
+              <div class="magnitude-key">
                 <!-- Items generated by code, looks like -->
                 <!-- <div class="magnitude-item"><div class="magnitude-example" style="width: 10px; height: 10px; margin-left: -5px; margin-top: -5px;"></div>1</div> -->
 
@@ -148,7 +134,7 @@
             </div>
             <div class="key-column ui-block-b">
               <p>Depth</p>
-              <div class="space-please depth-key">
+              <div class="depth-key">
                 <div class="depth-gradient"></div>
                 <div class="labels">
                   <!-- Labels generated by code, looks like -->

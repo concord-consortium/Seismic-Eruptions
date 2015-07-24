@@ -5,6 +5,7 @@ and the data filter
 NNode = require("./NNode")
 MagnitudeSliderUI = require("./MagnitudeSliderUI")
 DataFormatter = require("./DataFormatter")
+SessionController = require("./SessionController")
 
 module.exports = new
 class MagnitudeFilterController extends NNode
@@ -14,12 +15,15 @@ class MagnitudeFilterController extends NNode
     super
     @minMagnitude = 5
 
+    @sessionController = SessionController
+
     # Create and hook up a display options panel
     @uiMagnitudeSlider = MagnitudeSliderUI
     @uiMagnitudeSlider.subscribe "update", (value)=>
       @minMagnitude = value
       @postControllerChanges()
       @updateMagnitudeSlider()
+      @updateSession()
 
     @uiMagnitudeSlider.tell "configure", {
       minMagnitude: MagnitudeFilterController.MIN_MAGNITUDE
@@ -28,10 +32,23 @@ class MagnitudeFilterController extends NNode
       initialMinMagnitude: @minMagnitude
     }
 
+    @sessionController.subscribe "update", (session)=>
+      {
+        @minMagnitude
+      } = session
+      @postControllerChanges()
+      @updateMagnitudeSlider()
+
     @updateMagnitudeSlider()
+    @updateSession()
 
     # When requested, update
     @listen "request-update", @postControllerChanges
+
+  updateSession: ()->
+    @sessionController.tell "append", {
+      @minMagnitude
+    }
 
   # Tells everyone that the filter has changed
   postControllerChanges: ()->

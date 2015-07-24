@@ -7,6 +7,7 @@ skipped them both for rapid prototyping.
 NNode = require("./NNode")
 BoundariesToggleUI = require("./BoundariesToggleUI")
 MapView = require("./MapView")
+SessionController = require("./SessionController")
 
 module.exports = new
 class BoundariesLayerManager extends NNode
@@ -16,7 +17,10 @@ class BoundariesLayerManager extends NNode
     @boundariesLayer = new L.KML("plates.kml", {async: true})
 
     # Hold previously displaying state
-    @previouslyDisplaying = false
+    @boundariesVisible = false
+    @boundariesPreviouslyVisible = false
+
+    @sessionController = SessionController
 
     # Rig up that map view
     @mapView = MapView
@@ -25,9 +29,28 @@ class BoundariesLayerManager extends NNode
     @boundariesToggle = BoundariesToggleUI
 
     @boundariesToggle.subscribe "update", (value)=>
-      if value
-        @mapView.tell "add-layer", @boundariesLayer unless @previouslyDisplaying
-      else
-        @mapView.tell "remove-layer", @boundariesLayer if @previouslyDisplaying
+      @boundariesVisible = value
+      @updateBoundaries()
+      @updateSession()
 
-      @previouslyDisplaying = value
+    @sessionController.subscribe "update", (session)=>
+      {
+        @boundariesVisible
+      } = session
+      @updateBoundaries()
+
+    @updateSession()
+
+  updateSession: ()->
+    @sessionController.tell "append", {
+      @boundariesVisible
+    }
+
+  updateBoundaries: ()->
+    @boundariesToggle.tell "set", @boundariesVisible
+
+    if @boundariesVisible
+      @mapView.tell "add-layer", @boundariesLayer unless @boundariesPreviouslyVisible
+    else
+      @mapView.tell "remove-layer", @boundariesLayer if @boundariesPreviouslyVisible
+    @boundariesPreviouslyVisible = @boundariesVisible

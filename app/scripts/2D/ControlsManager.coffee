@@ -4,12 +4,15 @@ Manages the showing/hiding of the bottom bar
 
 NNode = require("./NNode")
 ControlsUI = require("./ControlsUI")
+SessionController = require("./SessionController")
 
 module.exports = new
 class App extends NNode
   constructor: ()->
     super
     @controlsUI = ControlsUI
+
+    @sessionController = SessionController
 
     # Holds whether or not the controls are visible
     @controlsVisible = yes
@@ -22,10 +25,26 @@ class App extends NNode
     @controlsUI.subscribe "update", ()=>
       # Toggle control visibility
       @controlsVisible = !@controlsVisible
+      @updateControlVisibility()
+      @updateSession()
 
-      if @controlsVisible
-        @controls.finish().slideDown(300)
-        @showControls.finish().fadeOut(300)
-      else
-        @controls.finish().slideUp(300)
-        @showControls.finish().fadeIn(300)
+    @sessionController.subscribe "update", (session)=>
+      {
+        @controlsVisible
+      } = session
+      @updateControlVisibility()
+
+    @updateSession()
+
+  updateSession: ()->
+    @sessionController.tell "append", {
+      @controlsVisible
+    }
+
+  updateControlVisibility: ()->
+    if @controlsVisible
+      @controls.finish().slideDown(300)
+      @showControls.finish().fadeOut(300)
+    else
+      @controls.finish().slideUp(300)
+      @showControls.finish().fadeIn(300)

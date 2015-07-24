@@ -9,15 +9,6 @@
   padding 0
   z-index 0
 
-// Style the map's zoom in/out buttons properly
-// #map
-//   .leaflet-control-zoom > a
-//     // NOTE Taken from jQuery mobile.
-//     background-color #2a2a2a
-//     border-color #1d1d1d
-//     color #fff
-//     text-shadow 0 1px 0 #111
-
 /*.ui-icon-knife after
   background-image url("../images/knife-dashed-line.png")
   background-size 18px 18px
@@ -145,3 +136,26 @@ MAX_MAGNITUDE_SIZE = 50px
         position absolute
         top (MAX_MAGNITUDE_SIZE/2)
         left (MAX_MAGNITUDE_SIZE/2)
+
+// Animated earthquakes
+@-webkit-keyframes fantastic-entrance
+  0%
+    fill #fff
+    transform scale(0)
+  20%
+    transform scale(1)
+
+@keyframes fantastic-entrance
+  0%
+    fill #fff
+    transform scale(0)
+  20%
+    transform scale(1)
+
+#map
+  // Get where those earthquake markers reside
+  .leaflet-overlay-pane > svg
+    path[fill-opacity="0.8"]
+      transform-origin center
+      -moz-transform-origin center
+      animation fantastic-entrance 1000ms

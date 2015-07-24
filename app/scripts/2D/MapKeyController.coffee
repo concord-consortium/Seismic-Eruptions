@@ -5,10 +5,12 @@ Could perhaps be split into multiple classes
 NNode = require("./NNode")
 DataFormatter = require("./DataFormatter")
 MapKeyToggleUI = require("./MapKeyToggleUI")
+SessionController = require("./SessionController")
 
 module.exports = new
 class MapKeyController extends NNode
   constructor: ()->
+    super
     @mapKey = $("#map-key")
 
     # Populate the keys
@@ -25,17 +27,37 @@ class MapKeyController extends NNode
     @mapKey.find(".depth-key > .labels").html(
       ("<p>#{depth} km</p>" for depth in [0..DataFormatter.MAX_DEPTH] by 100).join(""))
 
+
+    @sessionController = SessionController
+    @sessionController.subscribe "update", (session)=>
+      {
+        @keyVisible
+      } = session
+      @updateKeyVisibility()
+
     # Rig up show/hiding
     @mapKeyToggle = MapKeyToggleUI
 
     # Variable to hold whether hidden or not
     @keyVisible = no
-    @mapKey.hide()
 
     @mapKeyToggle.subscribe "update", (value)=>
       # Toggle control visibility
       @keyVisible = value
-      if @keyVisible
-        @mapKey.finish().fadeIn(300)
-      else
-        @mapKey.finish().fadeOut(300)
+      @updateKeyVisibility()
+      @updateSession()
+
+    @updateSession()
+
+  updateSession: ()->
+    @sessionController.tell "append", {
+      @keyVisible
+    }
+
+  updateKeyVisibility: ()->
+    @mapKeyToggle.tell "set", @keyVisible
+
+    if @keyVisible
+      @mapKey.finish().fadeIn(300)
+    else
+      @mapKey.finish().fadeOut(300)

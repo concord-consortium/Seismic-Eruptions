@@ -12,6 +12,8 @@ class App extends NNode
       require("./BaseMapLayerManager")
       require("./ControlsManager")
       require("./MapKeyController")
+      require("./MapViewManager")
+      require("./HashController")
 
   superHackySliderKeyboardHack: ()->
     # HACK HACK HACK HACK HACK HACK Please remove when the keyboard actually works

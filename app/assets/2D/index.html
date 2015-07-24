@@ -75,8 +75,8 @@
       <div class="ui-body">
         <h4>Seismic Eruptions</h4>
         <div class="space-please">
-          <label for="sharing-link">Share with link</label>
-          <input type="text" name="sharing-link" value="TODO">
+          <label for="share-link">Share with link</label>
+          <input type="text" name="share-link" id="share-link" value="">
         </div>
         <div class="space-please">
           View the project on <a href="https://github.com/concord-consortium/Seismic-Eruptions">GitHub</a>
@@ -91,7 +91,7 @@
     </div>
     <div data-role="content">
       <div id="map"></div>
-      <div class="ui-bar ui-grid-b" id="controls">
+      <div class="ui-bar ui-grid-b" id="controls" style="display: none;">
         <div class="ui-grid-b ui-block-a" id="playcontrols">
           <div class="ui-block-a">
             <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-backward ui-corner-all" id="slowdown" tabindex="1" accesskey="l" href="" title="Slower"></a>
@@ -120,7 +120,7 @@
         </div>
       </div>
       <a class="ui-btn ui-btn ui-shadow ui-icon-fa ui-icon-fa-chevron-up ui-corner-all" id="show-controls" href="" title="Show Controls" style="display:none"></a>
-      <div id="map-key" class="ui-popup-container fade ui-popup-active ui-body-inherit ui-overlay-shadow ui-corner-all">
+      <div id="map-key" class="ui-popup-container fade ui-popup-active ui-body-inherit ui-overlay-shadow ui-corner-all" style="display: none;">
         <div class="ui-body">
           <h4>Map Key</h4>
           <div class="ui-grid-a">

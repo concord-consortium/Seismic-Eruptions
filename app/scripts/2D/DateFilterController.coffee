@@ -6,7 +6,7 @@ NNode = require("./NNode")
 PlaybackController = require("./PlaybackController")
 DateRangeSliderUI = require("./DateRangeSliderUI")
 DataFormatter = require("./DataFormatter")
-Utils = require("./Utils")
+SessionController = require("./SessionController")
 
 module.exports = new
 class DateFilterController extends NNode
@@ -20,13 +20,17 @@ class DateFilterController extends NNode
     @endDate = DateFilterController.MAX_DATE
     @animatedEndDate = DateFilterController.MAX_DATE
 
+    @sessionController = SessionController
+
     # Create and hook up a playback controller
     @playbackController = PlaybackController
 
     @playbackController.subscribe "update", (progress)=>
       @animatedEndDate = progress * (@endDate - @startDate) + @startDate
+      @limitDatesJustInCase()
       @postControllerChanges()
       @updatePlaybackSliderTextOnly()
+      @updateSession()
 
     # Create and hook up a the UI date range
     @dateRangeSlider = DateRangeSliderUI
@@ -44,6 +48,7 @@ class DateFilterController extends NNode
       @postControllerChanges()
       @updateDateRange()
       @updatePlaybackSlider()
+      @updateSession()
 
     @dateRangeSlider.subscribe "update-end", (end)=>
       @endDate = (new Date(end, 11, 31)).valueOf()
@@ -51,17 +56,39 @@ class DateFilterController extends NNode
       @postControllerChanges()
       @updateDateRange()
       @updatePlaybackSlider()
-
-    @updatePlaybackSlider()
-    @updateDateRange()
+      @updateSession()
 
     # When requested, update
     @listen "request-update", @postControllerChanges
 
+    # React to the changing session
+    @sessionController.subscribe "update", (session)=>
+      {
+        @startDate
+        @animatedEndDate
+        @endDate
+      } = session
+      @limitDatesJustInCase()
+      @postControllerChanges()
+      @updateDateRange()
+      @updatePlaybackSlider()
+
+    @updatePlaybackSlider()
+    @updateDateRange()
+    @updateSession()
+
+  updateSession: ()->
+    @sessionController.tell "append", {
+      @startDate
+      @animatedEndDate
+      @endDate
+    }
+
+
   # Limits the animated end date to fit in the start and end dates
   limitDatesJustInCase: ()->
     @endDate = Math.min(@endDate, DateFilterController.MAX_DATE)
-    @animatedEndDate = Math.min(Math.max(@animatedEndDate, @startDate), @endDate)
+    @animatedEndDate = Math.round(Math.min(Math.max(@animatedEndDate, @startDate), @endDate))
 
   # Tells everyone that the filter has changed
   postControllerChanges: ()->

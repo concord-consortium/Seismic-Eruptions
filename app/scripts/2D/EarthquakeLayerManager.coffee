@@ -79,7 +79,7 @@ class EarthquakeLayerManager extends NNode
           opacity: 0.2
           color: "#000"
           # Fill
-          fillOpacity: 0.8
+          fillOpacity: 0.8 # Note: fill opacity is used to identify these earthquake markers in css
           fillColor: DataFormatter.depthToColor(depth)
           radius: DataFormatter.magnitudeToRadius(magnitude)
         }

@@ -7,6 +7,7 @@ skipped them both for rapid prototyping.
 NNode = require("./NNode")
 BaseMapSelectorUI = require("./BaseMapSelectorUI")
 MapView = require("./MapView")
+SessionController = require("./SessionController")
 
 module.exports = new
 class BaseMapLayerManager extends NNode
@@ -19,8 +20,11 @@ class BaseMapLayerManager extends NNode
     @earthquakeDensityMap =
       L.tileLayer('http://{s}.tiles.mapbox.com/v3/bclc-apec.map-rslgvy56/{z}/{x}/{y}.png', {})
 
-    # Hold previously (currently) displaying map type
-    @previouslyDisplaying = @satelliteMap
+    @sessionController = SessionController
+
+    # Hold current and previously displaying map type
+    @baseLayer = "satellite"
+    @previousBaseLayer = null
 
     # Rig up that map view
     @mapView = MapView
@@ -29,13 +33,36 @@ class BaseMapLayerManager extends NNode
     @baseMapSelector = BaseMapSelectorUI
 
     # Rig up that switching
-    @mapView.tell "add-layer", @satelliteMap
-
     @baseMapSelector.subscribe "update", (value)=>
-      # Switcheroo
-      @mapView.tell "remove-layer", @previouslyDisplaying
+      @baseLayer = value
+      @updateBaseLayer()
+      @updateSession()
 
-      @mapView.tell "add-layer", @previouslyDisplaying = switch value
-        when "street" then @streetMap
-        when "satellite" then @satelliteMap
-        when "density" then @earthquakeDensityMap
+    @sessionController.subscribe "update", (session)=>
+      {
+        @baseLayer
+      } = session
+      @updateBaseLayer()
+
+    @updateBaseLayer()
+    @updateSession()
+
+  updateSession: ()->
+    @sessionController.tell "append", {
+      @baseLayer
+    }
+
+  updateBaseLayer: ()->
+    @baseMapSelector.tell "set", @baseLayer
+
+    if @previousBaseLayer isnt @baseLayer
+      # Switcheroo
+      @mapView.tell "remove-layer", @getLayer(@previousBaseLayer) if @previousBaseLayer?
+      @mapView.tell "add-layer",  @getLayer(@baseLayer)
+      @previousBaseLayer = @baseLayer
+
+  getLayer: (name)->
+    return switch name
+      when "street" then @streetMap
+      when "satellite" then @satelliteMap
+      when "density" then @earthquakeDensityMap

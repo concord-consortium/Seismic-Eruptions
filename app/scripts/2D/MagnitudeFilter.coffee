@@ -10,7 +10,7 @@ CacheFilter = require("./CacheFilter")
 MagnitudeFilterController = require("./MagnitudeFilterController")
 
 module.exports = new
-class MagnitudeFilterFilter extends NNode
+class MagnitudeFilter extends NNode
   constructor: ()->
     super
 

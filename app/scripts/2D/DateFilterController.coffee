@@ -45,7 +45,6 @@ class DateFilterController extends NNode
     @dateRangeSlider.subscribe "update-start", (start)=>
       @startDate = (new Date(start, 0)).valueOf()
       # Update playback to reflect data changes
-      @animatedEndDate = Infinity
       @limitDatesJustInCase()
       @postControllerChanges()
       @updateDateRange()
@@ -92,6 +91,7 @@ class DateFilterController extends NNode
   # Limits the animated end date to fit in the start and end dates
   limitDatesJustInCase: ()->
     @endDate = Math.min(@endDate, DateFilterController.MAX_DATE)
+    @startDate = Math.max(@startDate, DateFilterController.MIN_DATE)
     @animatedEndDate = Math.round(Math.min(Math.max(@animatedEndDate, @startDate), @endDate))
 
   # Tells everyone that the filter has changed
@@ -121,5 +121,8 @@ class DateFilterController extends NNode
 
   # Set the date range text
   updateDateRange: ()->
+    startYear = (new Date(@startDate)).getFullYear()
+    endYear = (new Date(@endDate)).getFullYear()
     @dateRangeSlider.tell "set-text",
-        "#{(new Date(@startDate)).getFullYear()} and #{(new Date(@endDate)).getFullYear()}"
+        "#{startYear} and #{endYear}"
+    @dateRangeSlider.tell "set", startYear, endYear

@@ -5,7 +5,7 @@ Represents the two show/hide chevron buttons
 NNode = require("./NNode")
 
 module.exports = new
-class App extends NNode
+class ControlsUI extends NNode
   constructor: ()->
     super
     # Get those buttons

@@ -16,11 +16,9 @@ class MagnitudeSliderUI extends NNode
     @magnitudeSliderReadout = $("#magnitude-readout")
 
     @listen "configure", (options)=>
-      {minMagnitude, maxMagnitude, magnitudeStep, initialMinMagnitude} = options
+      {minMagnitude, maxMagnitude, magnitudeStep} = options
       @magnitudeSlider
         .attr("min", minMagnitude).attr("max", maxMagnitude).attr("step", magnitudeStep)
-      @magnitudeSlider.val(initialMinMagnitude)
-      @magnitudeSlider.slider("refresh")
 
     @magnitudeSlider.on "change", ()=>
       unless preventChangeFromHappenningHack
@@ -29,7 +27,7 @@ class MagnitudeSliderUI extends NNode
     # When magnitude filter is updated, adjust the readout and tweak the slider value
     @listen "set", (value)->
       preventChangeFromHappenningHack = yes
-      @magnitudeSlider.val(sliderVal).slider("refresh")
+      @magnitudeSlider.val(value).slider("refresh")
       preventChangeFromHappenningHack = no
 
     @listen "set-text", (text)->

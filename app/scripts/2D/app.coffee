@@ -1,19 +1,18 @@
 NNode = require("./NNode")
 
-module.exports =
+module.exports = new
 class App extends NNode
   constructor: ()->
     super
-    $(document).on "pagecreate", ()=>
-      # HACK: Make keyboard events on sliders work
-      @superHackySliderKeyboardHack()
-      require("./EarthquakeLayerManager")
-      require("./BoundariesLayerManager")
-      require("./BaseMapLayerManager")
-      require("./ControlsManager")
-      require("./MapKeyController")
-      require("./MapViewManager")
-      require("./HashController")
+    # HACK: Make keyboard events on sliders work
+    @superHackySliderKeyboardHack()
+    require("./EarthquakeLayerManager")
+    require("./BoundariesLayerManager")
+    require("./BaseMapLayerManager")
+    require("./ControlsManager")
+    require("./MapKeyController")
+    require("./MapViewManager")
+    require("./HashController")
 
   superHackySliderKeyboardHack: ()->
     # HACK HACK HACK HACK HACK HACK Please remove when the keyboard actually works

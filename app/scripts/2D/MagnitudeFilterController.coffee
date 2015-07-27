@@ -21,6 +21,7 @@ class MagnitudeFilterController extends NNode
     @uiMagnitudeSlider = MagnitudeSliderUI
     @uiMagnitudeSlider.subscribe "update", (value)=>
       @minMagnitude = value
+      @limitMagnitudeJustInCase()
       @postControllerChanges()
       @updateMagnitudeSlider()
       @updateSession()
@@ -29,13 +30,13 @@ class MagnitudeFilterController extends NNode
       minMagnitude: MagnitudeFilterController.MIN_MAGNITUDE
       maxMagnitude: MagnitudeFilterController.MAX_MAGNITUDE
       magnitudeStep: 0.1
-      initialMinMagnitude: @minMagnitude
     }
 
     @sessionController.subscribe "update", (session)=>
       {
         @minMagnitude
       } = session
+      @limitMagnitudeJustInCase()
       @postControllerChanges()
       @updateMagnitudeSlider()
 
@@ -44,6 +45,10 @@ class MagnitudeFilterController extends NNode
 
     # When requested, update
     @listen "request-update", @postControllerChanges
+
+  limitMagnitudeJustInCase: ()->
+    @minMagnitude = Math.min(Math.max(@minMagnitude,
+      MagnitudeFilterController.MIN_MAGNITUDE), MagnitudeFilterController.MAX_MAGNITUDE)
 
   updateSession: ()->
     @sessionController.tell "append", {
@@ -60,3 +65,4 @@ class MagnitudeFilterController extends NNode
   # in the format (sliderValue, textToDisplay)
   updateMagnitudeSlider: ()->
     @uiMagnitudeSlider.tell "set-text", "#{DataFormatter.formatMagnitude(@minMagnitude)}"
+    @uiMagnitudeSlider.tell "set", @minMagnitude

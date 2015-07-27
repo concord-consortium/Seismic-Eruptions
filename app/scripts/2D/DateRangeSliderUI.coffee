@@ -5,6 +5,8 @@ class DateRangeSliderUI extends NNode
   constructor: ()->
     super
 
+    preventChangeFromHappenningHack = no
+
     # Rig up those date sliders
     @dateSliderStart = $("#date-slider-start")
     @dateSliderEnd = $("#date-slider-end")
@@ -12,19 +14,25 @@ class DateRangeSliderUI extends NNode
 
     # Configure them based on options
     @listen "configure", (options)=>
-      {startYear, endYear, yearStep, initialStartYear, initialEndYear} = options
+      {startYear, endYear, yearStep} = options
       @dateSliderStart.add(@dateSliderEnd)
         .attr("min", startYear).attr("max", endYear).attr("step", yearStep)
-      @dateSliderStart.val(initialStartYear)
-      @dateSliderEnd.val(initialEndYear)
+
+    @listen "set", (startVal, endVal)=>
+      preventChangeFromHappenningHack = yes
+      @dateSliderStart.val(startVal)
+      @dateSliderEnd.val(endVal)
       @dateSliderStart.add(@dateSliderEnd).slider("refresh")
+      preventChangeFromHappenningHack = no
 
     # Rig up some events
     @dateSliderStart.on "change", ()=>
-      @post "update-start", parseInt(@dateSliderStart.val())
+      unless preventChangeFromHappenningHack
+        @post "update-start", parseInt(@dateSliderStart.val())
 
     @dateSliderEnd.on "change", ()=>
-      @post "update-end", parseInt(@dateSliderEnd.val())
+      unless preventChangeFromHappenningHack
+        @post "update-end", parseInt(@dateSliderEnd.val())
 
     @listen "set-text", (text)=>
       @dateSliderReadout.text(text)

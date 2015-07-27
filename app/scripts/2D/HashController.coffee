@@ -8,12 +8,15 @@ SessionController = require("./SessionController")
 
 module.exports = new
 class HashController extends NNode
+
   constructor: ()->
     super
     @sessionController = SessionController
 
     @delayedTimer = null
     @lastUpdate = null
+    @lastHash = null # To detect when the hash changes
+
     @sessionController.subscribe "append", (session)=>
       # Defer rapid update events to a maximum of 1.5 seconds
       if @delayedTimer?
@@ -27,17 +30,19 @@ class HashController extends NNode
       else
         @updateLink(session)
 
-    $(window).on "load", ()=>
-      # find a better way to load hashes?
-      try
-        @sessionController.tell "replace-and-update",
-          JSON.parse(window.decodeURIComponent(window.location.hash[1...]))
-      catch error
+    $(window).on "load hashchange", ()=>
+      if @lastHash isnt window.location.hash
+        # find a better way to load hashes?
+        try
+          @sessionController.tell "replace-and-update",
+            JSON.parse(window.decodeURIComponent(window.location.hash[1...]))
+        catch error
+        @lastHash = window.location.hash
+        # Force an update of the url
+        @sessionController.tell "append", {}
 
-      # Force a url update
-      @sessionController.tell "append", {}
 
   updateLink: (session)->
-    window.location.hash = "##{window.encodeURIComponent(JSON.stringify(session))}"
+    window.location.hash = @lastHash = "##{window.encodeURIComponent(JSON.stringify(session))}"
     $("#share-link").val("#{window.location}")
     @lastUpdate = Date.now()

@@ -147,9 +147,186 @@
       </div>
     </div>
   </div>
+  <!-- Magic debugging code -->
+  <div style="display:none;" id="magic-debug">
+  </div>
+  <script type="text/javascript" src="http://sigmajs.org/assets/js/sigma.min.js"></script>
+  <script type="text/javascript" src="//cdn.jsdelivr.net/sigma.js/1.0.2/plugins/sigma.layout.forceAtlas2.min.js"></script>
   <script type="text/javascript">
-    var App = require('2D/app'),
-      app = new App(); // some comment
+    if(window.location.search==="?debug"){
+    document.getElementById("magic-debug").setAttribute("style", "position:absolute;z-index:1500;left:50px;top:0;width:500px;height:500px;background-color:rgba(0,0,0,0.7);")
+    sigma.settings.minNodeSize = 0
+    sigma.settings.maxNodeSize = 0
+    sigma.settings.minEdgeSize = 0
+    sigma.settings.maxEdgeSize = 0
+    sigma.settings.sideMargin = 4
+    sigma.settings.rescaleIgnoreSize = true
+    sigma.settings.defaultLabelColor = "#bbb"
+    sigma.settings.defaultLabelSize = 16
+    sigma.settings.labelThreshold = 13
+    var s = window.s = new sigma("magic-debug");
+    var randomizer = 0;
+    var addNode = function(nodeName){
+      if(!s.graph.nodes(nodeName)){
+        var color = (
+          nodeName.endsWith("UI")?["#59485a","#b391b5"]:
+          nodeName.endsWith("Controller")?["#4c6979","#99d2f2"]:
+          nodeName.endsWith("Filter")?["#7f6f38","#ffdf71"]:
+          nodeName.endsWith("Provider")?["#7f4740","#ff8f80"]:
+          nodeName.endsWith("Manager")?["#516c3b","#a3d977"]:
+          nodeName.endsWith("View")?["#2d5d53","#5abaa7"]:
+          "#000000"
+        )
+        s.graph.addNode({
+          id: nodeName,
+          label: nodeName,
+          x: Math.sin(parseInt(nodeName[0], 36)+randomizer++),
+          y: Math.cos(parseInt(nodeName[1], 36)+randomizer++),
+          size: 10,
+          color: color[0],
+          originalColor: color[0],
+          blinkColor: color[1],
+          blink: 0
+        })
+      }
+    }
+    var blinkNode = function(nodeName){
+      var node = s.graph.nodes(nodeName)
+      if(node){
+        node.blink = 1;
+      }
+    }
+    var blinkEdge = function(node1Name, node2Name, flow){
+      blinkNode(node1Name);
+      blinkNode(node2Name);
+      var edge = s.graph.edges(node1Name+"-"+node2Name)||s.graph.edges(node2Name+"-"+node1Name)
+      if(edge){
+        if(edge.flow < 1){
+          edge.flow = flow
+        }
+      }
+    }
+    var connectNodes = function(node1Name, node2Name){
+      addNode(node1Name);
+      addNode(node2Name);
+      s.graph.addEdge({
+        id:node1Name+"-"+node2Name,
+        source:node1Name,
+        target:node2Name,
+        flow: 0,
+        color:"#000000",
+        size: 3
+      })
+    }
+    var NNode = require("2D/NNode");
+    var runtimeStack = [];
+    var requireStack = [];
+    NNode.prototype._subscribe = NNode.prototype.subscribe;
+    NNode.prototype.subscribe = function(channel, listener){
+      var subscriber = requireStack[requireStack.length-1];
+      var newListener = function(){
+        runtimeStack.push(subscriber);
+        listener.apply(this, arguments);
+        runtimeStack.pop();
+      }
+      newListener.origin = subscriber;
+      NNode.prototype._subscribe.call(this, channel, newListener);
+    };
+    NNode.prototype._post = NNode.prototype.post;
+    NNode.prototype.post = function(channel){
+      var postingNode = this.constructor.name;
+      if(this.subscriberListenerMap[channel]){
+        this.subscriberListenerMap[channel].forEach(function(listener){
+          blinkEdge(postingNode, listener.origin, 1);
+        })
+      }
+      NNode.prototype._post.apply(this, arguments);
+    };
+
+    NNode.prototype._listen = NNode.prototype.listen;
+    NNode.prototype.listen = function(channel, listener){
+      var listenerName = this.constructor.name;
+      var newListener = function(){
+        runtimeStack.push(listenerName);
+        listener.apply(this, arguments);
+        runtimeStack.pop();
+      }
+      NNode.prototype._listen.call(this, channel, newListener);
+    };
+    NNode.prototype._tell = NNode.prototype.tell;
+    NNode.prototype.tell = function(channel){
+      var tellTarget = this.constructor.name;
+      var tellOrigin = runtimeStack[runtimeStack.length-1]||requireStack[requireStack.length-1];
+      if(tellOrigin){
+        blinkEdge(tellOrigin ,tellTarget, -1);
+      }
+      NNode.prototype._tell.apply(this, arguments);
+    };
+
+    window._require = window.require;
+    window.require = function(path){
+      name = path.match(/[a-zA-Z]+$/)[0];
+      requireStack.push(name);
+      lastTwo = requireStack.slice(-2);
+      var ignore = ["NNode","DataFormatter","SessionController","app"];
+      if(ignore.indexOf(lastTwo[0])===-1&&ignore.indexOf(lastTwo[1])===-1){
+        if(lastTwo.length > 1){
+          connectNodes(lastTwo[1], lastTwo[0]);
+        }
+      }
+      var result = window._require(path);
+      requireStack.pop();
+      return result;
+    };
+    var lerpColor = function(a,b,n){
+      var red = parseInt(a[1]+a[2], 16),
+          green = parseInt(a[3]+a[4], 16),
+          blue = parseInt(a[5]+a[6], 16);
+      var redTarget = parseInt(b[1]+b[2], 16),
+          greenTarget = parseInt(b[3]+b[4], 16),
+          blueTarget = parseInt(b[5]+b[6], 16);
+      red = Math.round(red*(1-n)+redTarget*n).toString(16)
+      green = Math.round(green*(1-n)+greenTarget*n).toString(16)
+      blue = Math.round(blue*(1-n)+blueTarget*n).toString(16)
+      return "#"+ "00".slice(red.length)+red+"00".slice(green.length)+green+"00".slice(blue.length)+blue;
+    }
+    var update = function(){
+      s.graph.nodes().forEach(function(node){
+        node.blink*=(node.blink<0.01)?0:0.98;
+        node.color = lerpColor(node.originalColor, node.blinkColor, node.blink)
+        node.size = 12+5*node.blink
+      })
+      s.graph.edges().forEach(function(edge){
+        edge.flow*=(Math.abs(edge.flow)<0.01)?0:0.98
+        edge.size = 4 + 5 * Math.abs(edge.flow)
+        if(edge.flow===0){
+          edge.color = "#666666"
+        }
+        else if(edge.flow<0){
+          edge.color = lerpColor("#666666", s.graph.nodes(edge.target).color, -edge.flow)
+        }
+        else{
+          edge.color = lerpColor("#666666", s.graph.nodes(edge.source).color, edge.flow)
+        }
+
+      })
+      s.refresh();
+      window.requestAnimationFrame(update);
+    }
+    $(document).ready(function(){
+      s.refresh();
+      s.startForceAtlas2();
+      s.forceatlas2.p.strongGravityMode = true;
+      setTimeout(function(){s.stopForceAtlas2();}, 10000);
+      update();
+    })
+    }
+  </script>
+
+  <script type="text/javascript">
+    $(document).on("pagecreate", function(){
+      require('2D/app');
+    })
   </script>
 </body>
 

@@ -35,6 +35,7 @@ class App extends NNode
       @updateControlVisibility()
 
     @updateSession()
+    @updateControlVisibility()
 
   updateSession: ()->
     @sessionController.tell "append", {

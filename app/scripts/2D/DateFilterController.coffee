@@ -44,6 +44,8 @@ class DateFilterController extends NNode
 
     @dateRangeSlider.subscribe "update-start", (start)=>
       @startDate = (new Date(start, 0)).valueOf()
+      # Update playback to reflect data changes
+      @animatedEndDate = Infinity
       @limitDatesJustInCase()
       @postControllerChanges()
       @updateDateRange()
@@ -52,6 +54,8 @@ class DateFilterController extends NNode
 
     @dateRangeSlider.subscribe "update-end", (end)=>
       @endDate = (new Date(end, 11, 31)).valueOf()
+      # Update playback to reflect data changes
+      @animatedEndDate = Infinity
       @limitDatesJustInCase()
       @postControllerChanges()
       @updateDateRange()

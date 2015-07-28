@@ -108,6 +108,10 @@ MAX_MAGNITUDE_SIZE = 50px
   right 10px
   top 10px
   z-index 75
+  #map-key-close
+    // Map key close button
+    z-index 100
+    margin 0
   .key-column
     min-width 110px
   .depth-key
@@ -136,7 +140,20 @@ MAX_MAGNITUDE_SIZE = 50px
         position absolute
         top (MAX_MAGNITUDE_SIZE/2)
         left (MAX_MAGNITUDE_SIZE/2)
-
+  .boundaries-key
+    margin-top 1em
+    margin-bottom 0.4em
+    .labels
+      padding 5px 0 5px 20px
+      position relative
+      .indicator
+        position absolute
+        top 0
+        left 0
+        bottom 0
+        width 12px
+      .needs-shadow
+        box-shadow 0 0 10px 0 rgba(0, 0, 0, .2)
 // Animated earthquakes
 @-webkit-keyframes fantastic-entrance
   0%

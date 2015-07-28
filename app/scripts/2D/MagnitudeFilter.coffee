@@ -17,20 +17,21 @@ class MagnitudeFilter extends NNode
     # Rig up a controller
     @controller = MagnitudeFilterController
 
-    @minMagnitude = -Infinity
-    @maxMagnitude = Infinity
+    @startMagnitude = -Infinity
+    @endMagnitude = Infinity
 
     @controller.subscribe "update", (updatedFilter) =>
       # Shim so I can write less code
-      updatedFilter.maxMagnitude = Infinity
+      updatedFilter.endMagnitude = Infinity
 
       # Event when the controller has updated parameters.
-      if updatedFilter.minMagnitude > @minMagnitude or updatedFilter.maxMagnitude < @maxMagnitude
+      if updatedFilter.startMagnitude > @startMagnitude or
+      updatedFilter.endMagnitude < @endMagnitude
 
         # Filter region has shrunk, thus data may be invalid
 
-        @post "flush", @filterMagnitudes(@cachedData, updatedFilter.minMagnitude,
-          updatedFilter.maxMagnitude)
+        @post "flush", @filterMagnitudes(@cachedData, updatedFilter.startMagnitude,
+          updatedFilter.endMagnitude)
 
       else
         # Filter region has grown
@@ -38,15 +39,16 @@ class MagnitudeFilter extends NNode
         additionalPoints = []
 
         # Append to that array all new points on (possibly) both ends of the new range
-        @filterMagnitudes @cachedData, updatedFilter.minMagnitude, @minMagnitude, additionalPoints
-        @filterMagnitudes @cachedData, @maxMagnitude, updatedFilter.maxMagnitude, additionalPoints
+        @filterMagnitudes @cachedData, updatedFilter.startMagnitude, @startMagnitude,
+          additionalPoints
+        @filterMagnitudes @cachedData, @endMagnitude, updatedFilter.endMagnitude, additionalPoints
 
         # Stream the new data to the further filters
         @post "stream", additionalPoints if additionalPoints.length > 0
 
       # Update current filter state
-      @minMagnitude = updatedFilter.minMagnitude
-      @maxMagnitude = updatedFilter.maxMagnitude
+      @startMagnitude = updatedFilter.startMagnitude
+      @endMagnitude = updatedFilter.endMagnitude
 
     # Here's where all the data that enters the filter will be stored.
     @cachedData = []
@@ -62,22 +64,22 @@ class MagnitudeFilter extends NNode
         @cachedData.push(point)
 
       # Then, stream it on!
-      @post "stream", @filterMagnitudes(newData, @minMagnitude, @maxMagnitude)
+      @post "stream", @filterMagnitudes(newData, @startMagnitude, @endMagnitude)
 
     @inputNode.subscribe "flush", (freshData)=>
       # Incoming data has changed in a way that the current cache
       # is out of date, and may contain points irrelevant to the stream. Thus, purge the cache
       # and refill with fresh data. Also, refill the next filter with fresh data too.
       @cachedData = freshData
-      @post "flush", @filterMagnitudes(@cachedData, @minMagnitude, @maxMagnitude)
+      @post "flush", @filterMagnitudes(@cachedData, @startMagnitude, @endMagnitude)
 
   ###
   Creates a new array and fills it with the dataset, diced with given parameters
-  Note: minMagnitude is inclusive, maxMagnitude is exclusive
+  Note: startMagnitude is inclusive, endMagnitude is exclusive
   ###
-  filterMagnitudes: (data, minMagnitude, maxMagnitude, newArray = [])->
+  filterMagnitudes: (data, startMagnitude, endMagnitude, newArray = [])->
     # NOTE: This is where the filter MAGIC happens
     for point in data
-      if minMagnitude <= point.properties.mag < maxMagnitude
+      if startMagnitude <= point.properties.mag < endMagnitude
         newArray.push(point)
     return newArray

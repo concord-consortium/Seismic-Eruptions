@@ -14,9 +14,9 @@ class DateRangeSliderUI extends NNode
 
     # Configure them based on options
     @listen "configure", (options)=>
-      {startYear, endYear, yearStep} = options
+      {minYear, maxYear, yearStep} = options
       @dateSliderStart.add(@dateSliderEnd)
-        .attr("min", startYear).attr("max", endYear).attr("step", yearStep)
+        .attr("min", minYear).attr("max", maxYear).attr("step", yearStep)
 
     @listen "set", (startVal, endVal)=>
       preventChangeFromHappenningHack = yes

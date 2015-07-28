@@ -36,7 +36,7 @@
 
 <body>
   <div data-role="page" id="index">
-    <div data-role="popup" class='ui-content' id="display-options-menu" data-arrow="b" style="overflow: visible;">
+    <div data-role="popup" class="ui-content" id="display-options-menu" data-arrow="b" style="overflow: visible;">
       <div class="ui-body">
         <div class="space-please">
           <div data-role="rangeslider">
@@ -121,6 +121,7 @@
       </div>
       <a class="ui-btn ui-btn ui-shadow ui-icon-fa ui-icon-fa-chevron-up ui-corner-all" id="show-controls" href="" title="Show Controls" style="display:none"></a>
       <div id="map-key" class="ui-popup-container fade ui-popup-active ui-body-inherit ui-overlay-shadow ui-corner-all" style="display: none;">
+        <a href="" id="map-key-close" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
         <div class="ui-body">
           <h4>Map Key</h4>
           <div class="ui-grid-a">
@@ -143,28 +144,40 @@
               </div>
             </div>
           </div>
+          <div class="boundaries-key" style="display:none;">
+            <div class="labels"><div class="indicator needs-shadow" style="background-color:#ffffff;"></div>Continental Convergent Boundary</div>
+            <div class="labels"><div class="indicator" style="background-color:#a83800;"></div>Continental Transform Fault</div>
+            <div class="labels"><div class="indicator" style="background-color:#ffff00;"></div>Continental Rift Boundary</div>
+            <div class="labels"><div class="indicator" style="background-color:#e600a9;"></div>Oceanic Convergent Boundary</div>
+            <div class="labels"><div class="indicator" style="background-color:#38a800;"></div>Oceanic Transform Fault</div>
+            <div class="labels"><div class="indicator" style="background-color:#bf2026;"></div>Oceanic Spreading Rift</div>
+            <div class="labels"><div class="indicator" style="background-color:#508fcb;"></div>Subduction Zone</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  <!-- Magic debugging code -->
+  <!-- Magic debugging code - please comment the div and three scripts if you don't need them -->
   <div style="display:none;" id="magic-debug">
   </div>
   <script type="text/javascript" src="http://sigmajs.org/assets/js/sigma.min.js"></script>
   <script type="text/javascript" src="//cdn.jsdelivr.net/sigma.js/1.0.2/plugins/sigma.layout.forceAtlas2.min.js"></script>
   <script type="text/javascript">
+    var s;
     if(window.location.search==="?debug"||window.location.search==="?debugall"){
-    document.getElementById("magic-debug").setAttribute("style", "position:absolute;z-index:1500;left:50px;top:0;width:500px;height:500px;background-color:rgba(0,0,0,0.7);")
-    sigma.settings.minNodeSize = 0
-    sigma.settings.maxNodeSize = 0
-    sigma.settings.minEdgeSize = 0
-    sigma.settings.maxEdgeSize = 0
-    sigma.settings.sideMargin = 4
-    sigma.settings.rescaleIgnoreSize = true
-    sigma.settings.defaultLabelColor = "#bbb"
-    sigma.settings.defaultLabelSize = 16
-    sigma.settings.labelThreshold = 13
-    var s = window.s = new sigma("magic-debug");
+    $("#magic-debug").attr("style", "position:absolute;z-index:1500;left:50px;top:0;width:300px;height:300px;background-color:rgba(0,0,0,0.7);").resizable().on("resize", function(){
+      s.renderers[0].resize()
+    })
+    sigma.settings.minNodeSize = 0;
+    sigma.settings.maxNodeSize = 0;
+    sigma.settings.minEdgeSize = 0;
+    sigma.settings.maxEdgeSize = 0;
+    sigma.settings.sideMargin = 4;
+    sigma.settings.rescaleIgnoreSize = true;
+    sigma.settings.defaultLabelColor = "#bbb";
+    sigma.settings.defaultLabelSize = 16;
+    sigma.settings.labelThreshold = 13;
+    s = window.s = new sigma("magic-debug");
     var randomizer = 0;
     var addNode = function(nodeName){
       if(!s.graph.nodes(nodeName)){

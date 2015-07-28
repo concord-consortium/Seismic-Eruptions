@@ -6,12 +6,19 @@ NNode = require("./NNode")
 DataFormatter = require("./DataFormatter")
 MapKeyToggleUI = require("./MapKeyToggleUI")
 SessionController = require("./SessionController")
+MapKeyPanelUI = require("./MapKeyPanelUI")
+BoundariesLayerManager = require("./BoundariesLayerManager")
 
 module.exports = new
 class MapKeyController extends NNode
   constructor: ()->
     super
     @mapKey = $("#map-key")
+
+    # Maybe there's a better place to put this?
+    @boundariesKey = $("#map-key .boundaries-key")
+
+    @boundariesLayerManager = BoundariesLayerManager
 
     # Populate the keys
     @mapKey.find(".magnitude-key").html(
@@ -27,7 +34,6 @@ class MapKeyController extends NNode
     @mapKey.find(".depth-key > .labels").html(
       ("<p>#{depth} km</p>" for depth in [0..DataFormatter.MAX_DEPTH] by 100).join(""))
 
-
     @sessionController = SessionController
     @sessionController.subscribe "update", (updates)=>
       if "keyVisible" of updates
@@ -37,6 +43,8 @@ class MapKeyController extends NNode
     # Rig up show/hiding
     @mapKeyToggle = MapKeyToggleUI
 
+    @mapKeyPanel = MapKeyPanelUI
+
     # Variable to hold whether hidden or not
     @keyVisible = no
 
@@ -45,6 +53,19 @@ class MapKeyController extends NNode
       @keyVisible = value
       @updateKeyVisibility()
       @updateSession()
+
+    @mapKeyPanel.subscribe "update", (value)=>
+      # Toggle key visibility
+      @keyVisible = false
+      @updateKeyVisibility()
+      @updateSession()
+
+    # Maybe there's a better place to put this?
+    @boundariesLayerManager.subscribe "update", (value)=>
+      if value
+        @boundariesKey.slideDown(300)
+      else
+        @boundariesKey.slideUp(300)
 
     @updateSession()
 

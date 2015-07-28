@@ -9,32 +9,36 @@ SessionController = require("./SessionController")
 
 module.exports = new
 class MagnitudeFilterController extends NNode
-  @MIN_MAGNITUDE: 3
-  @MAX_MAGNITUDE: 9
   constructor: ()->
     super
-    @minMagnitude = 5
+    @minMagnitude = 3
+    @maxMagnitude = 9
+    @startMagnitude = 5
 
     @sessionController = SessionController
 
     # Create and hook up a display options panel
     @uiMagnitudeSlider = MagnitudeSliderUI
     @uiMagnitudeSlider.subscribe "update", (value)=>
-      @minMagnitude = value
+      @startMagnitude = value
       @limitMagnitudeJustInCase()
       @postControllerChanges()
       @updateMagnitudeSlider()
       @updateSession()
 
-    @uiMagnitudeSlider.tell "configure", {
-      minMagnitude: MagnitudeFilterController.MIN_MAGNITUDE
-      maxMagnitude: MagnitudeFilterController.MAX_MAGNITUDE
-      magnitudeStep: 0.1
-    }
 
     @sessionController.subscribe "update", (updates)=>
+      needsUpdating = no
+      if "startMagnitude" of updates
+        {@startMagnitude} = updates
+        needsUpdating = yes
       if "minMagnitude" of updates
         {@minMagnitude} = updates
+        needsUpdating = yes
+      if "maxMagnitude" of updates
+        {@maxMagnitude} = updates
+        needsUpdating = yes
+      if needsUpdating
         @limitMagnitudeJustInCase()
         @postControllerChanges()
         @updateMagnitudeSlider()
@@ -46,22 +50,30 @@ class MagnitudeFilterController extends NNode
     @listen "request-update", @postControllerChanges
 
   limitMagnitudeJustInCase: ()->
-    @minMagnitude = Math.min(Math.max(@minMagnitude,
-      MagnitudeFilterController.MIN_MAGNITUDE), MagnitudeFilterController.MAX_MAGNITUDE)
+    @minMagnitude = Math.min(@minMagnitude, @maxMagnitude)
+    @startMagnitude = Math.min(Math.max(@startMagnitude,
+      @minMagnitude), @maxMagnitude)
 
   updateSession: ()->
     @sessionController.tell "append", {
+      @startMagnitude
       @minMagnitude
+      @maxMagnitude
     }
 
   # Tells everyone that the filter has changed
   postControllerChanges: ()->
     @post "update", {
-      minMagnitude: @minMagnitude
+      @startMagnitude
     }
 
   # Tell the magnitude slider what to be set as
   # in the format (sliderValue, textToDisplay)
   updateMagnitudeSlider: ()->
-    @uiMagnitudeSlider.tell "set-text", "#{DataFormatter.formatMagnitude(@minMagnitude)}"
-    @uiMagnitudeSlider.tell "set", @minMagnitude
+    @uiMagnitudeSlider.tell "configure", {
+      @minMagnitude
+      @maxMagnitude
+      magnitudeStep: 0.1
+    }
+    @uiMagnitudeSlider.tell "set-text", "#{DataFormatter.formatMagnitude(@startMagnitude)}"
+    @uiMagnitudeSlider.tell "set", @startMagnitude

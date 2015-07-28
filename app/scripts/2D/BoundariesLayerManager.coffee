@@ -50,6 +50,10 @@ class BoundariesLayerManager extends NNode
 
     if @boundariesVisible
       @mapView.tell "add-layer", @boundariesLayer unless @boundariesPreviouslyVisible
+      @post "update", true # Let the map key know about the visibility
+
     else
       @mapView.tell "remove-layer", @boundariesLayer if @boundariesPreviouslyVisible
+      @post "update", false # Let the map key know about the visibility
+
     @boundariesPreviouslyVisible = @boundariesVisible

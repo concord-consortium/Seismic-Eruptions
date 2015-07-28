@@ -11,14 +11,16 @@ SessionController = require("./SessionController")
 module.exports = new
 class DateFilterController extends NNode
 
-  @MIN_DATE: (new Date(1900, 0)).valueOf()
-  @MAX_DATE: Date.now()
 
   constructor: ()->
     super
+
+    @minDate = (new Date(1900, 0)).valueOf()
+    @maxDate = Date.now()
+
     @startDate = new Date(1960, 0).valueOf()
-    @endDate = DateFilterController.MAX_DATE
-    @animatedEndDate = DateFilterController.MAX_DATE
+    @endDate = @maxDate
+    @sliderDate = @maxDate
 
     @sessionController = SessionController
 
@@ -26,7 +28,7 @@ class DateFilterController extends NNode
     @playbackController = PlaybackController
 
     @playbackController.subscribe "update", (progress)=>
-      @animatedEndDate = progress * (@endDate - @startDate) + @startDate
+      @sliderDate = progress * (@endDate - @startDate) + @startDate
       @limitDatesJustInCase()
       @postControllerChanges()
       @updatePlaybackSliderTextOnly()
@@ -34,13 +36,6 @@ class DateFilterController extends NNode
 
     # Create and hook up a the UI date range
     @dateRangeSlider = DateRangeSliderUI
-    @dateRangeSlider.tell "configure", {
-      startYear: (new Date(DateFilterController.MIN_DATE)).getFullYear()
-      endYear: (new Date(DateFilterController.MAX_DATE)).getFullYear()
-      yearStep: 1
-      initialStartYear: (new Date(@startDate)).getFullYear()
-      initialEndYear: (new Date(@endDate)).getFullYear()
-    }
 
     @dateRangeSlider.subscribe "update-start", (start)=>
       @startDate = (new Date(start, 0)).valueOf()
@@ -54,7 +49,7 @@ class DateFilterController extends NNode
     @dateRangeSlider.subscribe "update-end", (end)=>
       @endDate = (new Date(end, 11, 31)).valueOf()
       # Update playback to reflect data changes
-      @animatedEndDate = Infinity
+      @sliderDate = Infinity
       @limitDatesJustInCase()
       @postControllerChanges()
       @updateDateRange()
@@ -70,11 +65,17 @@ class DateFilterController extends NNode
       if "startDate" of updates
         {@startDate} = updates
         needsUpdating = yes
-      if "animatedEndDate" of updates
-        {@animatedEndDate} = updates
+      if "sliderDate" of updates
+        {@sliderDate} = updates
         needsUpdating = yes
       if "endDate" of updates
         {@endDate} = updates
+        needsUpdating = yes
+      if "minDate" of updates
+        {@minDate} = updates
+        needsUpdating = yes
+      if "maxDate" of updates
+        {@maxDate} = updates
         needsUpdating = yes
       if needsUpdating
         @limitDatesJustInCase()
@@ -89,33 +90,36 @@ class DateFilterController extends NNode
   updateSession: ()->
     @sessionController.tell "append", {
       @startDate
-      @animatedEndDate
+      @sliderDate
       @endDate
+      @minDate
+      @maxDate
     }
 
 
   # Limits the animated end date to fit in the start and end dates
   limitDatesJustInCase: ()->
-    @endDate = Math.min(@endDate, DateFilterController.MAX_DATE)
-    @startDate = Math.max(@startDate, DateFilterController.MIN_DATE)
-    @animatedEndDate = Math.round(Math.min(Math.max(@animatedEndDate, @startDate), @endDate))
+    @minYear = Math.min(@minYear, @maxYear)
+    @endDate = Math.min(@endDate, @maxDate)
+    @startDate = Math.max(@startDate, @minDate)
+    @sliderDate = Math.round(Math.min(Math.max(@sliderDate, @startDate), @endDate))
 
   # Tells everyone that the filter has changed
   postControllerChanges: ()->
     @post "update", {
-      startDate: @startDate
-      endDate: @animatedEndDate
+      @startDate
+      endDate: @sliderDate
     }
 
   updatePlaybackSliderTextOnly: ()->
     # Set the playhead text
     @playbackController.tell "set-text",
-      "#{DataFormatter.formatDate(@animatedEndDate)}"
+      "#{DataFormatter.formatDate(@sliderDate)}"
 
   updatePlaybackSlider: ()->
     # Set the playhead depending on new start and end ranges
     @playbackController.tell "set",
-      (@animatedEndDate - @startDate) / (@endDate - @startDate)
+      (@sliderDate - @startDate) / (@endDate - @startDate) or 0
 
     # Set the playhead step (1/#days between start and end)
     msBetweenStartAndEnd = @endDate - @startDate
@@ -129,6 +133,11 @@ class DateFilterController extends NNode
   updateDateRange: ()->
     startYear = (new Date(@startDate)).getFullYear()
     endYear = (new Date(@endDate)).getFullYear()
+    @dateRangeSlider.tell "configure", {
+      minYear: (new Date(@minDate)).getFullYear()
+      maxYear: (new Date(@maxDate)).getFullYear()
+      yearStep: 1
+    }
     @dateRangeSlider.tell "set-text",
         "#{startYear} and #{endYear}"
     @dateRangeSlider.tell "set", startYear, endYear

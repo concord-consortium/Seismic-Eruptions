@@ -33,11 +33,10 @@ class BoundariesLayerManager extends NNode
       @updateBoundaries()
       @updateSession()
 
-    @sessionController.subscribe "update", (session)=>
-      {
-        @boundariesVisible
-      } = session
-      @updateBoundaries()
+    @sessionController.subscribe "update", (updates)=>
+      if "boundariesVisible" of updates
+        {@boundariesVisible} = updates
+        @updateBoundaries()
 
     @updateSession()
 

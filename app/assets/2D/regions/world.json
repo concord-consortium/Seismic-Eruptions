@@ -1,43 +1,18 @@
 {
-  "zoomLevel": 3,
-  "latitude": 32.47,
-  "longitude": -30.85,
+  "datasets":["datasets/world.json"],
+  "minLatitude":-20,
+  "minLongitude":-90,
+  "maxLatitude":60,
+  "maxLongitude":30,
+  "restrictedView":true,
   "type": "FeatureCollection",
   "features": [
     {
       "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              -59.4140625,
-              25.799891182088334
-            ],
-            [
-              -59.4140625,
-              25.799891182088334
-            ],
-            [
-              -58.71093750000001,
-              25.799891182088334
-            ],
-            [
-              -58.71093750000001,
-              25.799891182088334
-            ],
-            [
-              -59.4140625,
-              25.799891182088334
-            ]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {},
+      "properties": {
+        "label": "California",
+        "scaffold": "regions/california.json"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -80,7 +55,10 @@
     },
     {
       "type": "Feature",
-      "properties": {},
+      "properties": {
+        "label": "Just Northwest of Australia",
+        "scaffold": "regions/australia.json"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [

@@ -1,0 +1,10 @@
+{
+  "datasets":["datasets/australia.json"],
+  "maxLatitude": 20,
+  "maxLongitude": 143,
+  "minLatitude": -13,
+  "minLongitude": 92,
+  "restrictedView":true,
+  "type": "FeatureCollection",
+  "features": []
+}

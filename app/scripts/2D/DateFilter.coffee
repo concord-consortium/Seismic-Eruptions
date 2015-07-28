@@ -118,7 +118,6 @@ class DateFilter extends NNode
       @cachedData = freshData
       @post "flush", @filterDates(@cachedData, @startDate, @endDate)
 
-    @inputNode.tell "request-update"
   ###
   Creates a new array and fills it with the dataset, diced with given parameters
   Note: startDate is inclusive, endDate is exclusive

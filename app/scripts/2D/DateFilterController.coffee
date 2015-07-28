@@ -65,16 +65,22 @@ class DateFilterController extends NNode
     @listen "request-update", @postControllerChanges
 
     # React to the changing session
-    @sessionController.subscribe "update", (session)=>
-      {
-        @startDate
-        @animatedEndDate
-        @endDate
-      } = session
-      @limitDatesJustInCase()
-      @postControllerChanges()
-      @updateDateRange()
-      @updatePlaybackSlider()
+    @sessionController.subscribe "update", (updates)=>
+      needsUpdating = no
+      if "startDate" of updates
+        {@startDate} = updates
+        needsUpdating = yes
+      if "animatedEndDate" of updates
+        {@animatedEndDate} = updates
+        needsUpdating = yes
+      if "endDate" of updates
+        {@endDate} = updates
+        needsUpdating = yes
+      if needsUpdating
+        @limitDatesJustInCase()
+        @postControllerChanges()
+        @updateDateRange()
+        @updatePlaybackSlider()
 
     @updatePlaybackSlider()
     @updateDateRange()

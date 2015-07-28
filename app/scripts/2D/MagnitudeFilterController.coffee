@@ -32,13 +32,12 @@ class MagnitudeFilterController extends NNode
       magnitudeStep: 0.1
     }
 
-    @sessionController.subscribe "update", (session)=>
-      {
-        @minMagnitude
-      } = session
-      @limitMagnitudeJustInCase()
-      @postControllerChanges()
-      @updateMagnitudeSlider()
+    @sessionController.subscribe "update", (updates)=>
+      if "minMagnitude" of updates
+        {@minMagnitude} = updates
+        @limitMagnitudeJustInCase()
+        @postControllerChanges()
+        @updateMagnitudeSlider()
 
     @updateMagnitudeSlider()
     @updateSession()

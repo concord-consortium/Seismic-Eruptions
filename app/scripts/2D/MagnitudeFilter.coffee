@@ -71,7 +71,6 @@ class MagnitudeFilter extends NNode
       @cachedData = freshData
       @post "flush", @filterMagnitudes(@cachedData, @minMagnitude, @maxMagnitude)
 
-    @inputNode.tell "request-update"
   ###
   Creates a new array and fills it with the dataset, diced with given parameters
   Note: minMagnitude is inclusive, maxMagnitude is exclusive

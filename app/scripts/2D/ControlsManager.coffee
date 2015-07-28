@@ -28,11 +28,10 @@ class App extends NNode
       @updateControlVisibility()
       @updateSession()
 
-    @sessionController.subscribe "update", (session)=>
-      {
-        @controlsVisible
-      } = session
-      @updateControlVisibility()
+    @sessionController.subscribe "update", (updates)=>
+      if "controlsVisible" of updates
+        {@controlsVisible} = updates
+        @updateControlVisibility()
 
     @updateSession()
     @updateControlVisibility()

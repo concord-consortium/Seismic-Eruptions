@@ -12,12 +12,15 @@ class MapView extends NNode
 
     # TODO: Move this into LocationManager
 
+    @frozen = null
+
     $(window).on "load", ()=>
       @leafletMap.invalidateSize()
       @post "loaded"
-      # Rig up map movement
+      # Rig up map movement (and "freezing")
       @leafletMap.on "moveend", ()=>
-        @post "bounds-update", @leafletMap.getBounds()
+        unless @frozen
+          @post "bounds-update", @leafletMap.getBounds()
 
     @listen "add-layer", (layer)=>
       @leafletMap.addLayer(layer)
@@ -26,16 +29,18 @@ class MapView extends NNode
       @leafletMap.removeLayer(layer)
 
     # Freezes the map in it's current zoom and pan level
-    @listen "freeze", ()=>
-      @leafletMap.options.minZoom = @leafletMap.options.maxZoom = @leafletMap.getZoom()
-      @leafletMap.setMaxBounds(@leafletMap.getBounds())
+    @listen "freeze", (bounds)=>
+      @frozen = true
+      @leafletMap.setMaxBounds(bounds)
+      @leafletMap.options.minZoom =
+      @leafletMap.options.maxZoom = @leafletMap.getBoundsZoom(bounds)
 
     # Unfreezes the map from it's current zoom and pan level
     @listen "unfreeze", ()=>
-      # NOTE: 0 and 18 are leaflet constants
+      @frozen = false
+      @leafletMap.setMaxBounds(null)
       @leafletMap.options.minZoom = 0
       @leafletMap.options.maxZoom = 18
-      @leafletMap.setMaxBounds(null)
 
     # Rig up map movement updates
     @listen "set-bounds", (bounds)=>

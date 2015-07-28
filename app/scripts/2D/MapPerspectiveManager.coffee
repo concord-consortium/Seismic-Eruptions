@@ -7,7 +7,7 @@ MapView = require("./MapView")
 SessionController = require("./SessionController")
 
 module.exports = new
-class MapViewManager extends NNode
+class MapPerspectiveManager extends NNode
   constructor: ()->
     super
     @sessionController = SessionController
@@ -33,15 +33,25 @@ class MapViewManager extends NNode
       @maxLongitude = max.lng
       @updateSession()
 
-    @sessionController.subscribe "update", (session)=>
-      {
-        @minLatitude
-        @maxLatitude
-        @minLongitude
-        @maxLongitude
-        @restrictedView
-      } = session
-      @updateMapView()
+    @sessionController.subscribe "update", (updates)=>
+      needsUpdating = no
+      if "minLatitude" of updates
+        {@minLatitude} = updates
+        needsUpdating = yes
+      if "maxLatitude" of updates
+        {@maxLatitude} = updates
+        needsUpdating = yes
+      if "minLongitude" of updates
+        {@minLongitude} = updates
+        needsUpdating = yes
+      if "maxLongitude" of updates
+        {@maxLongitude} = updates
+        needsUpdating = yes
+      if "restrictedView" of updates
+        {@restrictedView} = updates
+        needsUpdating = yes
+      if needsUpdating
+        @updateMapView()
 
     @updateSession()
 
@@ -58,11 +68,14 @@ class MapViewManager extends NNode
     if @previouslyRestrictedView
       @mapView.tell "unfreeze"
 
-    @mapView.tell "set-bounds", L.latLngBounds(
+    bounds = L.latLngBounds(
       L.latLng(@minLatitude, @minLongitude),
       L.latLng(@maxLatitude, @maxLongitude)
     )
 
+    @mapView.tell "set-bounds", bounds
+
     if @restrictedView
-      @mapView.tell "freeze"
+      @mapView.tell "freeze", bounds
+
     @previouslyRestrictedView = @restrictedView

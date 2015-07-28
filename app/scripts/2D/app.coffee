@@ -9,9 +9,10 @@ class App extends NNode
     require("./EarthquakeLayerManager")
     require("./BoundariesLayerManager")
     require("./BaseMapLayerManager")
+    require("./ScaffoldLayerManager")
     require("./ControlsManager")
     require("./MapKeyController")
-    require("./MapViewManager")
+    require("./MapPerspectiveManager")
     require("./HashController")
 
   superHackySliderKeyboardHack: ()->

@@ -21,7 +21,20 @@ class SessionController extends NNode
     # Let properties defined in the passed parameters overwrite the
     # current properties. Used for hash updates.
     @listen "replace-and-update", (params)=>
+      updates = {}
       for key of @session when params[key]?
         if typeof @session[key] is typeof params[key]
-          @session[key] = params[key]
-      @post "update", @session
+          unless @isEqual(@session[key], params[key])
+            updates[key] = @session[key] = params[key]
+
+      @post "update", updates
+
+  # Quick equality hack for arrays
+  isEqual: (a, b)->
+    if a instanceof Array
+      return false if a.length isnt b.length
+      for i in [0...a.length]
+        return false unless @isEqual(a[i], b[i])
+      return true
+    else
+      return a is b

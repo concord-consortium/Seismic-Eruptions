@@ -29,11 +29,10 @@ class MapKeyController extends NNode
 
 
     @sessionController = SessionController
-    @sessionController.subscribe "update", (session)=>
-      {
-        @keyVisible
-      } = session
-      @updateKeyVisibility()
+    @sessionController.subscribe "update", (updates)=>
+      if "keyVisible" of updates
+        {@keyVisible} = updates
+        @updateKeyVisibility()
 
     # Rig up show/hiding
     @mapKeyToggle = MapKeyToggleUI

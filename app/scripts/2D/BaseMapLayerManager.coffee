@@ -38,11 +38,10 @@ class BaseMapLayerManager extends NNode
       @updateBaseLayer()
       @updateSession()
 
-    @sessionController.subscribe "update", (session)=>
-      {
-        @baseLayer
-      } = session
-      @updateBaseLayer()
+    @sessionController.subscribe "update", (updates)=>
+      if "baseLayer" of updates
+        {@baseLayer} = updates
+        @updateBaseLayer()
 
     @updateBaseLayer()
     @updateSession()

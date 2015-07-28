@@ -153,7 +153,7 @@
   <script type="text/javascript" src="http://sigmajs.org/assets/js/sigma.min.js"></script>
   <script type="text/javascript" src="//cdn.jsdelivr.net/sigma.js/1.0.2/plugins/sigma.layout.forceAtlas2.min.js"></script>
   <script type="text/javascript">
-    if(window.location.search==="?debug"){
+    if(window.location.search==="?debug"||window.location.search==="?debugall"){
     document.getElementById("magic-debug").setAttribute("style", "position:absolute;z-index:1500;left:50px;top:0;width:500px;height:500px;background-color:rgba(0,0,0,0.7);")
     sigma.settings.minNodeSize = 0
     sigma.settings.maxNodeSize = 0
@@ -268,7 +268,11 @@
       name = path.match(/[a-zA-Z]+$/)[0];
       requireStack.push(name);
       lastTwo = requireStack.slice(-2);
-      var ignore = ["NNode","DataFormatter","SessionController","app"];
+      var ignore = ["NNode","DataFormatter","app"];
+      if(window.location.search!=="?debugall"){
+        ignore.push("SessionController");
+        ignore.push("HashController");
+      }
       if(ignore.indexOf(lastTwo[0])===-1&&ignore.indexOf(lastTwo[1])===-1){
         if(lastTwo.length > 1){
           connectNodes(lastTwo[1], lastTwo[0]);
@@ -292,22 +296,21 @@
     }
     var update = function(){
       s.graph.nodes().forEach(function(node){
-        node.blink*=(node.blink<0.01)?0:0.98;
+        node.blink=(node.blink<0.01)?0:node.blink-0.005;
         node.color = lerpColor(node.originalColor, node.blinkColor, node.blink)
         node.size = 12+5*node.blink
       })
       s.graph.edges().forEach(function(edge){
-        edge.flow*=(Math.abs(edge.flow)<0.01)?0:0.98
+        edge.flow=(Math.abs(edge.flow)<0.01)?0:Math.sign(edge.flow)*(Math.abs(edge.flow)-0.005)
         edge.size = 4 + 5 * Math.abs(edge.flow)
-        if(edge.flow===0){
-          edge.color = "#666666"
-        }
-        else if(edge.flow<0){
-          edge.color = lerpColor("#666666", s.graph.nodes(edge.target).color, -edge.flow)
+        var targetColor;
+        if(edge.flow<0){
+          targetColor = s.graph.nodes(edge.target).color;
         }
         else{
-          edge.color = lerpColor("#666666", s.graph.nodes(edge.source).color, edge.flow)
+          targetColor = s.graph.nodes(edge.source).color;
         }
+        edge.color = lerpColor("#444444", targetColor, Math.abs(edge.flow))
 
       })
       s.refresh();

@@ -14,6 +14,7 @@
         "scaffold": "regions/capemendocino.json"
       },
       "geometry": {
+        "type": "Polygon",
         "coordinates": [
            [
              [

@@ -1,0 +1,48 @@
+<html>
+<head>
+  <title>Longitude Shift</title>
+</head>
+<body>
+<button id="do-shift">Shift Longitude</button>
+<input id='compact' type="checkbox" name="compact" value="compact"> Compact Formatting
+<br/>
+<textarea id="geojson-text" rows="60" cols="100">
+</textarea>
+<script>
+  function shiftCoordinate(coord) {
+    if(coord[0] < 0) {
+      coord[0] = coord[0] + 360;
+    }
+  }
+  function shiftLongitude(geoJSON) {
+    geoJSON.features.forEach(function (feature){
+      if(feature.geometry && feature.geometry.type === "Polygon" && feature.geometry.coordinates){
+        feature.geometry.coordinates.forEach(function (coordList){
+          coordList.forEach(function (coord){
+            shiftCoordinate(coord);
+          });
+        });
+      }
+      if(feature.geometry && feature.geometry.type === "Point" && feature.geometry.coordinates) {
+        shiftCoordinate(feature.geometry.coordinates);
+      }
+    });
+  }
+  var button = document.getElementById('do-shift');
+  button.addEventListener('click', function() {
+    var textarea = document.getElementById('geojson-text');
+    var geoJSON = JSON.parse(textarea.value);
+    var textResult = "";
+    var compact = document.getElementById('compact');
+    shiftLongitude(geoJSON);
+    if (compact.checked) {
+      textResult = JSON.stringify(geoJSON);
+      textResult = textResult.replace(/\{"type":"Feature/g, "\n{\"type\":\"Feature");
+    } else {
+      textResult = JSON.stringify(geoJSON,null,2);
+    }
+    textarea.value = textResult;
+  });
+</script>
+</body>
+</html>

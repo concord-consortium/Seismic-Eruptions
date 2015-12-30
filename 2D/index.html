@@ -1,145 +1,349 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Seismic Eruptions</title>
-    <meta http-equiv='Content-Type' content='text/html, charset=utf-8'/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densityDpi=device-dpi"/>
 
-    <link rel="stylesheet" type='text/css' href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-    <link rel="stylesheet" type='text/css' href="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
-    <link rel="stylesheet" type='text/css' href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
-    <link rel="stylesheet" type='text/css' href="//cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.css" />
-    <!--<link rel="stylesheet" type='text/css' href="../../../vendor/styles/font-awesome.css" />
+<head>
+  <title>Seismic Eruptions</title>
+  <meta http-equiv='Content-Type' content='text/html, charset=utf-8' />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+
+  <link rel="stylesheet" type='text/css' href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+  <link rel="stylesheet" type='text/css' href="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
+  <link rel="stylesheet" type='text/css' href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+  <link rel="stylesheet" type='text/css' href="//cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.css" />
+  <!--<link rel="stylesheet" type='text/css' href="../../../vendor/styles/font-awesome.css" />
     <link rel="stylesheet" type='text/css' href="../../../vendor/styles/leaflet.draw.css" />-->
-    <link rel="stylesheet" type='text/css' href="vendor-2d.css" />
-    <link rel="stylesheet" type='text/css' href="app-2d.css" />
-    <style type='text/css'>
-      .ui-content {
-        position: absolute;
-        top: 40px;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        padding: 0;
-      }
-      #map {
-        height: 100%;
-        position:absolute;
-        top:0;
-        bottom:0;
-        left:0;
-        right:0;
-        margin: 0;
-        padding: 0;
-      }
-      .ui-icon-knife:after {
-        background-image: url("../images/knife-dashed-line.png");
-        background-size: 18px 18px;
-      }
-    </style>
+  <link rel="stylesheet" type='text/css' href="vendor-2d.css" />
+  <link rel="stylesheet" type='text/css' href="app-2d.css" />
 
-    <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript">
-      $(document).bind("mobileinit", function(){
-        $.mobile.hashListeningEnabled = false;
-        $.mobile.pushStateEnabled = false;
-      });
-    </script>
-    <script type="text/javascript" src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-    <script type="text/javascript" src="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.12/jquery.mousewheel.min.js"></script>
-    <script type="text/javascript" src="//fgnass.github.io/spin.js/spin.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
-    <script type="text/javascript" src="vendor-2d.js"></script>
-    <script type="text/javascript" src="app-2d.js"></script>
+  <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript">
+    $(document).bind("mobileinit", function () {
+      $.mobile.hashListeningEnabled = false;
+      $.mobile.pushStateEnabled = false;
+    });
+  </script>
+  <script type="text/javascript" src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+  <script type="text/javascript" src="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.12/jquery.mousewheel.min.js"></script>
+  <script type="text/javascript" src="//fgnass.github.io/spin.js/spin.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+  <script type="text/javascript" src="vendor-2d.js"></script>
+  <script type="text/javascript" src="app-2d.js"></script>
 
-  </head>
-  <body>
-    <div data-role="page" id="index">
-      <div data-theme="b" data-role="header">
-        <h1>Seismic Eruptions</h1>
-        <a href="#options-quake-count" data-rel='popup' data-transition="slidedown" class="ui-btn ui-icon-info ui-mini ui-btn-icon-notext ui-corner-all" id='options-button'>Options</a>
-        <div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right">
-          <a href="#" class="ui-btn ui-btn-b ui-icon-knife ui-mini ui-btn-icon-notext ui-corner-all" id="drawingTool" onclick="app.map.startdrawing()">Draw Cross-Section</a>
-          <a href="#settings" class="ui-btn ui-icon-gear ui-mini ui-btn-icon-notext ui-corner-all">Settings</a>
-        </div>
-      </div>
-      <div data-role="panel" data-theme="b" data-display="overlay" id="options-details">
-        <div id="info" class="ui-bar ui-body-b"></div>
-        <div class="ui-bar ui-body-b">
-          <p id="startdate"></p>
-          <p id="enddate"></p>
-          <p id="magcutoff"></p>
-        </div>
-      </div>
-      <div data-role="popup" data-theme="b" class='ui-content' id="options-quake-count">
-        <div class="ui-body ui-body-b" style="min-width: 400px; min-height: 300px; overflow: visible;">
-          <div data-theme="b" data-role="header">
-            Check Quake Count
-          </div>
-          <div class="ui-bar ui-bar-a" id="quake-count">Earthquakes: ???</div>
-          <div style="padding:10px 20px;" data-theme="b">
-            <div id="daterange"></div>
-            <div id="daterange-picker-left" style="float: left; display: none;"></div>
-            <div id="daterange-picker-right" style="float: left; display: none;"></div>
-            <div style="padding-top: 10px;">
-              <label for='magnitude-slider'>Magnitude cutoff:</label>
-              <input id="magnitude-slider" name="magnitude-slider" type="range" min="1" max="9" value="5" step="0.1" >
-            </div>
-            <a href="#" class="ui-btn ui-btn-b ui-btn-inline ui-shadow ui-corner-all ui-mini ui-icon-search ui-btn-icon-right" id="getQuakeCount"> Get Count </a>
-            <a href="#" class="ui-btn ui-btn-b ui-btn-inline ui-shadow ui-corner-all ui-mini ui-icon-forward ui-btn-icon-right" id="loadSelectedData"> Show Me </a>
-            <a href="#" class="ui-btn ui-btn-b ui-btn-inline ui-shadow ui-corner-all ui-mini ui-icon-action ui-btn-icon-right" id="shareSelectedData"> Share </a>
-          </div>
-          <div id="share-wrapper" data-mini="true">
-            <h6>
-              Give this link to share:<br/>
-              <a id="share-link" href='#' target='_blank' style='word-break: break-word; -webkit-hyphens: auto; -moz-hyphens: auto; hyphens: auto;'></a>
-            </h6>
-          </div>
-        </div>
-      </div>
-       <div data-role="panel" data-position="right" data-display="overlay" data-theme="b" id="settings">
-        <form>
-          <div class="ui-field-contain">
-            <label for="plates">Plate-boundaries</label>
-            <input data-role="flipswitch" data-mini="true" type="checkbox" name="plates" id="plates" onchange="app.map.plateToggle()">
-          </div>
-          <div class="ui-field-contain ui-mini">
-            <select name="mapselector" id="mapselector" data-native-menu="false" data-mini="true">
-              <option value="1">PRCC Earthquake density map</option>
-              <option value="2" selected>Satellite map</option>
-              <option value="3">OSM map</option>
-            </select>
-          </div>
-        </form>
-      </div>
+</head>
 
-      <div data-role="content" data-theme="b">
-        <div id="map"></div>
-        <div class="ui-bar ui-body-b" style="width:100%;bottom:0px;left:0px;position:absolute"  id="playback">
-          <div class="ui-grid-d" id="playcontrols">
-            <div class="ui-block-a"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-play ui-corner-all" id="play"></a></div>
-            <div class="ui-block-b"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-pause ui-corner-all" id="pause"></a></div>
-            <div class="ui-block-c"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-forward ui-corner-all" id="speedup"></a></div>
-            <div class="ui-block-d"><a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-backward ui-corner-all" id="speeddown"></a></div>
-          </div>
-          <div class="ui-grid-a">
-            <div class="ui-block-a" id="slider-wrapper"></div>
-            <div class="ui-block-b" id="date"></div>
+<body>
+  <div data-role="page" id="index">
+    <div data-role="popup" class="ui-content" id="display-options-menu" data-arrow="b" style="overflow: visible;">
+      <div class="ui-body">
+        <div class="space-please">
+          <div data-role="rangeslider">
+            <label for="date-slider-start">Restrict to earthquakes between <b id="date-slider-readout">_</b></label>
+            <!-- Min, max, step, and value to be set by code -->
+            <input name="date-slider-start" id="date-slider-start" min="0" max="0" value="0" step="0" type="range" style="display:none;" />
+            <input name="date-slider-end" id="date-slider-end" min="0" max="0" value="0" step="0" type="range" style="display:none;" />
           </div>
         </div>
-        <div class="ui-bar ui-mini ui-body-b" style="width:100%;bottom:0px;position:absolute;display:none" id="crosssection">
-          <a class="ui-btn ui-btn-inline" onclick="app.map.render()">View Cross Section</a>
-          <a class="ui-btn ui-btn-inline" onclick="app.map.backtonormalview()" id="drawingToolDone">Done</a>
+        <div class="space-please">
+          <label for='magnitude-slider'>Only show earthquakes magnitude <b id="magnitude-readout">_</b> or stronger</label>
+          <!-- Min, max, step, and value to be set by code -->
+          <input id="magnitude-slider" name="magnitude-slider" type="range" range="max" min="0" max="0" value="0" step="0" data-highlight="true" style="display:none;">
+        </div>
+        <div class="space-please ui-grid-a">
+          <div class="ui-block-a">
+            <label for="plate-toggle">Show Map Key</label>
+            <input data-role="flipswitch" type="checkbox" name="map-key-toggle" id="map-key-toggle">
+          </div>
+          <div class="ui-block-b">
+            <label for="plate-toggle">Show Plate Boundaries</label>
+            <input data-role="flipswitch" type="checkbox" name="plate-toggle" id="plate-toggle">
+          </div>
+        </div>
+        <div class="space-please">
+          <label for="base-map-selector">Displayed Map Type</label>
+          <select name="base-map-selector" id="base-map-selector" data-native-menu="false">
+            <option value="density">Earthquake Density Map</option>
+            <option value="satellite" selected>Satellite Map</option>
+            <option value="street">Street Map</option>
+          </select>
         </div>
       </div>
-
     </div>
-    <script  type="text/javascript">
-      var App = require('2D/app'),
-          app = new App(); // some comment
-    </script>
-  </body>
+    <div data-role="popup" class='ui-content' id="info-credits-pane" data-arrow="b" style="overflow: visible;">
+      <div class="ui-body">
+        <h4>Seismic Eruptions</h4>
+        <div class="space-please">
+          <label for="share-link">Share with link</label>
+          <input type="text" name="share-link" id="share-link" value="">
+        </div>
+        <div class="space-please">
+          View the project on <a href="https://github.com/concord-consortium/Seismic-Eruptions">GitHub</a>
+        </div>
+        <div class="space-please">
+          <i>
+            Credits to PRCC for the Earthquake Density  map layer and OSM for the Street map
+          </i>
+        </div>
+        <!-- TODO: Adjust these contents and add more -->
+      </div>
+    </div>
+    <div data-role="content">
+      <div id="map"></div>
+      <div class="ui-bar ui-grid-b" id="controls" style="display: none;">
+        <div class="ui-grid-b ui-block-a" id="playcontrols">
+          <div class="ui-block-a">
+            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-backward ui-corner-all" id="slowdown" tabindex="1" accesskey="l" href="" title="Slower"></a>
+          </div>
+          <div class="ui-block-b">
+            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-play ui-corner-all" id="playpause" tabindex="2" accesskey="p" href="" title="Play/Pause"></a>
+          </div>
+          <div class="ui-block-c">
+            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-forward ui-corner-all" id="speedup" tabindex="3" accesskey="s" href="" title="Faster"></a>
+          </div>
+        </div>
+        <div class="ui-block-b" id="slider-wrapper" data-enhance="false" data-role="none">
+          <!-- Step and value to be set by code -->
+          <input id="slider" name="slider" type="range" min="0" max="1" value="0" step="0" style="display:none;" tabindex="4" data-highlight="true">
+        </div>
+        <div class="ui-block-c ui-grid-b">
+          <div class="ui-block-a">
+            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-gear ui-corner-all" id="display-options" tabindex="5" accesskey="o" title="Display Options" data-rel="popup" href="#display-options-menu"></a>
+          </div>
+          <div class="ui-block-b">
+            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-info ui-corner-all" id="about" tabindex="6" accesskey="i" data-rel="popup" href="#info-credits-pane" title="Info"></a>
+          </div>
+          <div class="ui-block-c">
+            <a class="ui-btn ui-shadow ui-icon-fa ui-icon-fa-chevron-down ui-corner-all" id="hide-controls" tabindex="7" accesskey="h" href="" title="Hide Controls"></a>
+          </div>
+        </div>
+      </div>
+      <a class="ui-btn ui-btn ui-shadow ui-icon-fa ui-icon-fa-chevron-up ui-corner-all" id="show-controls" href="" title="Show Controls" style="display:none"></a>
+      <div id="map-key" class="ui-popup-container fade ui-popup-active ui-body-inherit ui-overlay-shadow ui-corner-all" style="display: none;">
+        <a href="" id="map-key-close" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-right"></a>
+        <div class="ui-body">
+          <h4>Map Key</h4>
+          <div class="ui-grid-a">
+            <div class="key-column ui-block-a">
+              <p>Magnitude</p>
+              <div class="magnitude-key">
+                <!-- Items generated by code, looks like -->
+                <!-- <div class="magnitude-item"><div class="magnitude-example" style="width: 10px; height: 10px; margin-left: -5px; margin-top: -5px;"></div>1</div> -->
+
+              </div>
+            </div>
+            <div class="key-column ui-block-b">
+              <p>Depth</p>
+              <div class="depth-key">
+                <div class="depth-gradient"></div>
+                <div class="labels">
+                  <!-- Labels generated by code, looks like -->
+                  <!-- 1<br>2<br>3 -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="boundaries-key" style="display:none;">
+            <div class="labels"><div class="indicator needs-shadow" style="background-color:#ffffff;"></div>Continental Convergent Boundary</div>
+            <div class="labels"><div class="indicator" style="background-color:#a83800;"></div>Continental Transform Fault</div>
+            <div class="labels"><div class="indicator" style="background-color:#ffff00;"></div>Continental Rift Boundary</div>
+            <div class="labels"><div class="indicator" style="background-color:#e600a9;"></div>Oceanic Convergent Boundary</div>
+            <div class="labels"><div class="indicator" style="background-color:#38a800;"></div>Oceanic Transform Fault</div>
+            <div class="labels"><div class="indicator" style="background-color:#bf2026;"></div>Oceanic Spreading Rift</div>
+            <div class="labels"><div class="indicator" style="background-color:#508fcb;"></div>Subduction Zone</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Magic debugging code - please comment the div and three scripts if you don't need them -->
+  <div style="display:none;" id="magic-debug">
+  </div>
+  <script type="text/javascript" src="http://sigmajs.org/assets/js/sigma.min.js"></script>
+  <script type="text/javascript" src="//cdn.jsdelivr.net/sigma.js/1.0.2/plugins/sigma.layout.forceAtlas2.min.js"></script>
+  <script type="text/javascript">
+    var s;
+    if(window.location.search==="?debug"||window.location.search==="?debugall"){
+    $("#magic-debug").attr("style", "position:absolute;z-index:1500;left:50px;top:0;width:300px;height:300px;background-color:rgba(0,0,0,0.7);").resizable().on("resize", function(){
+      s.renderers[0].resize()
+    })
+    sigma.settings.minNodeSize = 0;
+    sigma.settings.maxNodeSize = 0;
+    sigma.settings.minEdgeSize = 0;
+    sigma.settings.maxEdgeSize = 0;
+    sigma.settings.sideMargin = 4;
+    sigma.settings.rescaleIgnoreSize = true;
+    sigma.settings.defaultLabelColor = "#bbb";
+    sigma.settings.defaultLabelSize = 16;
+    sigma.settings.labelThreshold = 13;
+    s = window.s = new sigma("magic-debug");
+    var randomizer = 0;
+    var addNode = function(nodeName){
+      if(!s.graph.nodes(nodeName)){
+        var color = (
+          nodeName.endsWith("UI")?["#59485a","#b391b5"]:
+          nodeName.endsWith("Controller")?["#4c6979","#99d2f2"]:
+          nodeName.endsWith("Filter")?["#7f6f38","#ffdf71"]:
+          nodeName.endsWith("Provider")?["#7f4740","#ff8f80"]:
+          nodeName.endsWith("Manager")?["#516c3b","#a3d977"]:
+          nodeName.endsWith("View")?["#2d5d53","#5abaa7"]:
+          "#000000"
+        )
+        s.graph.addNode({
+          id: nodeName,
+          label: nodeName,
+          x: Math.sin(parseInt(nodeName[0], 36)+randomizer++),
+          y: Math.cos(parseInt(nodeName[1], 36)+randomizer++),
+          size: 10,
+          color: color[0],
+          originalColor: color[0],
+          blinkColor: color[1],
+          blink: 0
+        })
+      }
+    }
+    var blinkNode = function(nodeName){
+      var node = s.graph.nodes(nodeName)
+      if(node){
+        node.blink = 1;
+      }
+    }
+    var blinkEdge = function(node1Name, node2Name, flow){
+      blinkNode(node1Name);
+      blinkNode(node2Name);
+      var edge = s.graph.edges(node1Name+"-"+node2Name)||s.graph.edges(node2Name+"-"+node1Name)
+      if(edge){
+        if(edge.flow < 1){
+          edge.flow = flow
+        }
+      }
+    }
+    var connectNodes = function(node1Name, node2Name){
+      addNode(node1Name);
+      addNode(node2Name);
+      s.graph.addEdge({
+        id:node1Name+"-"+node2Name,
+        source:node1Name,
+        target:node2Name,
+        flow: 0,
+        color:"#000000",
+        size: 3
+      })
+    }
+    var NNode = require("2D/NNode");
+    var runtimeStack = [];
+    var requireStack = [];
+    NNode.prototype._subscribe = NNode.prototype.subscribe;
+    NNode.prototype.subscribe = function(channel, listener){
+      var subscriber = requireStack[requireStack.length-1];
+      var newListener = function(){
+        runtimeStack.push(subscriber);
+        listener.apply(this, arguments);
+        runtimeStack.pop();
+      }
+      newListener.origin = subscriber;
+      NNode.prototype._subscribe.call(this, channel, newListener);
+    };
+    NNode.prototype._post = NNode.prototype.post;
+    NNode.prototype.post = function(channel){
+      var postingNode = this.constructor.name;
+      if(this.subscriberListenerMap[channel]){
+        this.subscriberListenerMap[channel].forEach(function(listener){
+          blinkEdge(postingNode, listener.origin, 1);
+        })
+      }
+      NNode.prototype._post.apply(this, arguments);
+    };
+
+    NNode.prototype._listen = NNode.prototype.listen;
+    NNode.prototype.listen = function(channel, listener){
+      var listenerName = this.constructor.name;
+      var newListener = function(){
+        runtimeStack.push(listenerName);
+        listener.apply(this, arguments);
+        runtimeStack.pop();
+      }
+      NNode.prototype._listen.call(this, channel, newListener);
+    };
+    NNode.prototype._tell = NNode.prototype.tell;
+    NNode.prototype.tell = function(channel){
+      var tellTarget = this.constructor.name;
+      var tellOrigin = runtimeStack[runtimeStack.length-1]||requireStack[requireStack.length-1];
+      if(tellOrigin){
+        blinkEdge(tellOrigin ,tellTarget, -1);
+      }
+      NNode.prototype._tell.apply(this, arguments);
+    };
+
+    window._require = window.require;
+    window.require = function(path){
+      name = path.match(/[a-zA-Z]+$/)[0];
+      requireStack.push(name);
+      lastTwo = requireStack.slice(-2);
+      var ignore = ["NNode","DataFormatter","app"];
+      if(window.location.search!=="?debugall"){
+        ignore.push("SessionController");
+        ignore.push("HashController");
+      }
+      if(ignore.indexOf(lastTwo[0])===-1&&ignore.indexOf(lastTwo[1])===-1){
+        if(lastTwo.length > 1){
+          connectNodes(lastTwo[1], lastTwo[0]);
+        }
+      }
+      var result = window._require(path);
+      requireStack.pop();
+      return result;
+    };
+    var lerpColor = function(a,b,n){
+      var red = parseInt(a[1]+a[2], 16),
+          green = parseInt(a[3]+a[4], 16),
+          blue = parseInt(a[5]+a[6], 16);
+      var redTarget = parseInt(b[1]+b[2], 16),
+          greenTarget = parseInt(b[3]+b[4], 16),
+          blueTarget = parseInt(b[5]+b[6], 16);
+      red = Math.round(red*(1-n)+redTarget*n).toString(16)
+      green = Math.round(green*(1-n)+greenTarget*n).toString(16)
+      blue = Math.round(blue*(1-n)+blueTarget*n).toString(16)
+      return "#"+ "00".slice(red.length)+red+"00".slice(green.length)+green+"00".slice(blue.length)+blue;
+    }
+    var update = function(){
+      s.graph.nodes().forEach(function(node){
+        node.blink=(node.blink<0.01)?0:node.blink-0.005;
+        node.color = lerpColor(node.originalColor, node.blinkColor, node.blink)
+        node.size = 12+5*node.blink
+      })
+      s.graph.edges().forEach(function(edge){
+        edge.flow=(Math.abs(edge.flow)<0.01)?0:Math.sign(edge.flow)*(Math.abs(edge.flow)-0.005)
+        edge.size = 4 + 5 * Math.abs(edge.flow)
+        var targetColor;
+        if(edge.flow<0){
+          targetColor = s.graph.nodes(edge.target).color;
+        }
+        else{
+          targetColor = s.graph.nodes(edge.source).color;
+        }
+        edge.color = lerpColor("#444444", targetColor, Math.abs(edge.flow))
+
+      })
+      s.refresh();
+      window.requestAnimationFrame(update);
+    }
+    $(document).ready(function(){
+      s.refresh();
+      s.startForceAtlas2();
+      s.forceatlas2.p.strongGravityMode = true;
+      setTimeout(function(){s.stopForceAtlas2();}, 10000);
+      update();
+    })
+    }
+  </script>
+
+  <script type="text/javascript">
+    $(document).on("pagecreate", function(){
+      require('2D/app');
+    })
+  </script>
+</body>
+
 </html>

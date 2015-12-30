@@ -18,7 +18,7 @@ class DateFilterController extends NNode
     @minDate = (new Date(1900, 0)).valueOf()
     @maxDate = Date.now()
 
-    @startDate = new Date(1960, 0).valueOf()
+    @startDate = new Date(1958, 0).valueOf()
     @endDate = @maxDate
     @sliderDate = @maxDate
 

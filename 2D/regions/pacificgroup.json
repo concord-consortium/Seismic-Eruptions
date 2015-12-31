@@ -1,6 +1,6 @@
 {
   "datasets": [
-    "datasets/PacificGroup.json"
+    "datasets/pacificgroup.json"
   ],
   "maxLatitude": 61,
   "maxLongitude": 294,

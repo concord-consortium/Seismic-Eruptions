@@ -28,16 +28,19 @@ class ScaffoldLayerManager extends NNode
     # Here's where some formatting magic occurs
     @scaffoldLayer = L.geoJson features, {
       onEachFeature: (featureData, marker)->
-        marker.clickable = true
+        marker.bindPopup("#{featureData.properties.label}", {closeButton: false, offset: new L.Point(0, 0)})
 
-        # Decide whether we want a popup or not
-        marker.bindPopup("""
-          #{featureData.properties.label}<br>
-          <a href="" onclick="window.location.hash=\
-          'scaffold:#{featureData.properties.scaffold}'">Go!</a>
-        """)
-        # marker.on "click", ()->
-        #   window.location.hash = "scaffold:#{featureData.properties.scaffold}"
+        marker.on 'click', (e)->
+          window.location.hash = "scaffold:#{featureData.properties.scaffold}"
+          # Click automatically opens popup, but we don't need it, as it happens on mouseover.
+          e.preventDefault()
+
+        marker.on 'mouseover', ()->
+          b = marker.getBounds()
+          marker.openPopup(new L.LatLng(b.getNorth(), b.getCenter().lng))
+
+        marker.on 'mouseout', ()->
+          marker.closePopup()
     }
 
     @mapView.tell "add-layer", @scaffoldLayer

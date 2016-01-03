@@ -28,6 +28,8 @@ class SessionController extends NNode
             updates[key] = @session[key] = params[key]
 
       @post "update", updates
+      # Let others know the session has been modified
+      @post "append", @session
 
   # Quick equality hack for arrays
   isEqual: (a, b)->

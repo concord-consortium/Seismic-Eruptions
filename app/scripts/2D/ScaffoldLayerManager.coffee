@@ -30,8 +30,8 @@ class ScaffoldLayerManager extends NNode
       onEachFeature: (featureData, marker)->
         marker.bindPopup("#{featureData.properties.label}", {closeButton: false, offset: new L.Point(0, 0)})
 
-        marker.on 'click', (e)->
-          window.location.hash = "scaffold:#{featureData.properties.scaffold}"
+        marker.on 'click', ()->
+          window.location.hash = window.encodeURIComponent("{\"scaffold\":\"#{featureData.properties.scaffold}\"}")
           # Click automatically opens popup, but we don't need it, as it happens on mouseover.
           marker.closePopup()
 

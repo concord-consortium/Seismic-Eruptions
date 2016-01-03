@@ -47,18 +47,12 @@ class ScaffoldController extends NNode
 
     @scaffold = ""
 
-    # Hash changed to a scaffolding hash... this means business
-    @hashController.subscribe "scaffold-update", (scaffoldURL)=>
-      @scaffold = scaffoldURL
-      @updateScaffold(true)
-      @updateSession()
-
     # A quick and tiny update
     @sessionController.subscribe "update", (updates)=>
       # Only update if the scaffold is the only one being updated
       if "scaffold" of updates
         {@scaffold} = updates
-        @updateScaffold(false)
+        @updateScaffold()
 
     @updateScaffold()
     @updateSession()
@@ -70,7 +64,7 @@ class ScaffoldController extends NNode
 
   # If alsoUpdateSession is true, completely updates the session to scaffold defaults
   # Otherwise just draw a pretty scaffold on the map
-  updateScaffold: (alsoUpdateSession)->
+  updateScaffold: (alsoUpdateSession = true)->
     # TODO: Add caching or something
     if @scaffold.length > 0
       $.ajax(@scaffold).done (data)=>

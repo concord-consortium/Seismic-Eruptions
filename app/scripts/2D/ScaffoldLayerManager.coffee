@@ -33,7 +33,7 @@ class ScaffoldLayerManager extends NNode
         marker.on 'click', (e)->
           window.location.hash = "scaffold:#{featureData.properties.scaffold}"
           # Click automatically opens popup, but we don't need it, as it happens on mouseover.
-          e.preventDefault()
+          marker.closePopup()
 
         marker.on 'mouseover', ()->
           b = marker.getBounds()
